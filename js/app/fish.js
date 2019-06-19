@@ -32,8 +32,16 @@ class Fish {
           zoneName: __p(DATA.ZONES[DATA.WEATHER_RATES[fishingSpot.territory_id].zone_id], "name"),
           spearfishing: spearfishing,
         };
+      } else if([147,148,149,150,151,152,153,154].includes(fishData.location)){ /* special case for diadem */
+        this.location = {
+          id: fishData.location, 
+          name: __p(fishingSpot, "name"), 
+          zoneId: 512,
+          zoneName: __p(DATA.ZONES[DATA.WEATHER_RATES["512"].zone_id], "name"), 
+          spearfishing: false
+        };
       } else {
-        this.location = {name: '', zoneName: '', id: 0, zoneId: 0, spearfishing: false};
+          this.location = {name: '', zoneName: '', id: 0, zoneId: 0, spearfishing: false};
       }
     } else {
       this.location = {name: '', zoneName: '', id: 0, zoneId: 0, spearfishing: false};

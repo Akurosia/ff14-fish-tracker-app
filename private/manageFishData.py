@@ -89,7 +89,7 @@ def load_dats(args):
 
 
 def _is_town_or_field_territory(name):
-    return len(name) == 4 and name[2] in ('f', 't', 'h') and str(name[3]).isdigit()
+    return len(name) == 4 and name[2] in ('f', 't', 'h') and (str(name[3]).isdigit() or str(name[3]) == 'c')
 
 
 def _collect_weather_rates(rate):

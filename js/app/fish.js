@@ -35,6 +35,14 @@ class Fish {
           spearfishing: spearfishing,
           coords: coords,
         };
+      } else if([147,148,149,150,151,152,153,154].includes(fishData.location)){ /* special case for diadem */
+        this.location = {
+          id: fishData.location, 
+          name: __p(fishingSpot, "name"), 
+          zoneId: 512,
+          zoneName: __p(DATA.ZONES[DATA.WEATHER_RATES["512"].zone_id], "name"), 
+          spearfishing: false
+        };
       } else {
         this.location = {name: '', zoneName: '', id: 0, zoneId: 0, coords: null, spearfishing: false};
       }
@@ -54,11 +62,11 @@ class Fish {
     };
     this.bait = {
       hasPredators: _(this.predators).size() > 0,
-      predators: _(this.predators).map((v, k) => {
-        return { id: Number(k),
-                 count: v,
-                 name: __p(DATA.ITEMS[k], "name"),
-                 icon: DATA.ITEMS[k].icon };
+      predators: _(this.predators).map(x => {
+        return { id: Number(x[0]),
+                 count: x[1],
+                 name: __p(DATA.ITEMS[x[0]], "name"),
+                 icon: DATA.ITEMS[x[0]].icon };
       }),
       path: _(this.bestCatchPath).map((x) => DATA.ITEMS[x])
     };

@@ -571,6 +571,7 @@ let FishTrain = function(){
 
       let crs_idx = 0;
 
+      try{ _(crs).first().start } catch { this.active = false; return; }
       // Is the fish going to be up AT ALL during any interval?!
       let eEndOfIntervals = eorzeaTime.toEorzea(dateFns.add(_(intervals).last(), duration));
       if (dateFns.isSameOrAfter(_(crs).first().start, eEndOfIntervals)) {

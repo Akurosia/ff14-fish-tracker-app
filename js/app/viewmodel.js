@@ -7,9 +7,9 @@
 // need to wrap the data model to support all of its fields.
 
 // Update this whenever a new patch is released.
-const LATEST_PATCH = 6.3;
+const LATEST_PATCH = 6.4;
 // Set this to the date at which new patch fishes are displayed by default.
-const SHOW_LATEST_PATCH_AFTER = dateFns.add(new Date(2023, 0, 10), { weeks: 2 });
+const SHOW_LATEST_PATCH_AFTER = dateFns.add(new Date(2023, 4, 23), { weeks: 2 });
 
 class SiteSettings {
   constructor() {
@@ -26,7 +26,7 @@ class SiteSettings {
                       3, 3.1, 3.2, 3.3, 3.4, 3.5,
                       4, 4.1, 4.2, 4.3, 4.4, 4.5,
                       5, 5.1, 5.2, 5.3, 5.4, 5.5,
-                      6, 6.1, 6.2, 6.3]),
+                      6, 6.1, 6.2, 6.3, 6.4]),
       // Extra filtering:
       // * all: Display all fish, regardless of extra status.
       // * collectable: Display only collectable fish.
@@ -232,7 +232,6 @@ class FishEntry {
     // This function should be called whenever the underlying fish data has changed.
     // Make sure you do this BEFORE updating the display...
     let fish = this.data;
-    let crs = fish.catchableRanges;
 
     // TODO: Even this is pretty heavy-handed. We should really only update
     // the fields which have changed... [NEEDS-OPTIMIZATION]
@@ -241,16 +240,27 @@ class FishEntry {
     this.isCaught = ViewModel.isFishCaught(this.id);
     this.isPinned = ViewModel.isFishPinned(this.id);
 
+    let crs = fish.catchableRanges;
+
     // The rest requires catchable ranges.
     if (crs.length > 0) {
-      // Cache the dates, they are used A LOT.
-      let currStart = eorzeaTime.toEarth(+crs[0].start);
-      let currEnd = eorzeaTime.toEarth(+crs[0].end);
       // NOTE: If it has one entry, it'll have 2...
       if (crs.length < 2) {
         console.error("Expected at least 2 catchable ranges for " + fish.name);
         return;
       }
+
+      // Cache the dates, they are used A LOT.
+      let currEnd = eorzeaTime.toEarth(+crs[0].end);
+      // CHECK IF THE CRS HAS EXPIRED!!!
+      if (dateFns.isSameOrAfter(earthTime, currEnd)) {
+        // Let the FishWatcher know it needs to update this fish!
+        currEnd = eorzeaTime.toEarth(+crs[1].end);
+        fishWatcher.reinitRangesForFish(fish, {earthTime: earthTime});
+        // NOTE: This will shift the CRS back!!!
+      }
+
+      let currStart = eorzeaTime.toEarth(+crs[0].start);
       let nextStart = eorzeaTime.toEarth(+crs[1].start);
 
       if (dateFns.isAfter(currStart, earthTime)) {
@@ -605,9 +615,6 @@ let ViewModel = new class {
       )
     ).subscribe(e => this.updateDisplay(e));
 
-    // Ok, now it's safe to have FishWatcher start listening for the next bell.
-    eorzeaTime.currentBellChanged.subscribe(bell => fishWatcher.updateFishes());
-
     console.timeEnd("Initialization");
   }
 
@@ -662,8 +669,8 @@ let ViewModel = new class {
       return;
     }
 
-    // console.info("Updating display...", reason);
-    // console.time('updateDisplay');
+    console.info("Updating display...", reason);
+    console.time('updateDisplay');
 
     // We need a base time!
     let timestamp = Date.now();
@@ -747,7 +754,7 @@ let ViewModel = new class {
       _(this.fishEntries).each(entry => this.layout.updateLanguage(entry));
     }
 
-    // console.timeEnd('updateDisplay');
+    console.timeEnd('updateDisplay');
   }
 
   isFishPinned(fishId) {

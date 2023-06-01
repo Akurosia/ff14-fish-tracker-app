@@ -594,6 +594,12 @@ let FishTrain = function(){
 
       // Is the fish going to be up AT ALL during any interval?!
       let eEndOfIntervals = eorzeaTime.toEorzea(dateFns.add(_(intervals).last(), duration));
+
+      if (crs.length == 0){
+        this.active = false;
+        return;
+      }
+
       if (dateFns.isSameOrAfter(_(crs).first().start, eEndOfIntervals)) {
         console.warn("%s won't be up for another %s", fish.name,
           dateFns.formatDistanceStrict(_(intervals).first(), eorzeaTime.toEarth(_(crs).first().start)));

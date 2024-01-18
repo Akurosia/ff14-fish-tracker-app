@@ -497,7 +497,16 @@ let FishTrain = function(){
             </div>
           </span><!-- bait span -->
         </td>
-      </tr>`
+      </tr>`,
+    tackleBoxBaitItems:
+     `{{~it :item}}
+        <div class="column">
+          <div class="content">
+            <div class="ui middle aligned bait-icon sprite-icon sprite-icon-fish_n_tackle-{{=item.icon}}" title="{{=item.name}}" style="margin-right: 0px;"></div>
+            {{=item.name}}
+          </div>
+        </div>
+      {{~}}`
   };
 
   class BaitEntry {
@@ -872,6 +881,7 @@ let FishTrain = function(){
         baitInfo: doT.template(templates.baitInfo),
         scheduleListEntry: doT.template(templates.scheduleListEntry),
         scheduleListIntuitionEntry: doT.template(templates.scheduleListIntuitionEntry),
+        tackleBoxBaitItems: doT.template(templates.tackleBoxBaitItems),
       };
 
       this.teamcraftId = null;
@@ -886,7 +896,7 @@ let FishTrain = function(){
                           3, 3.1, 3.2, 3.3, 3.4, 3.5,
                           4, 4.1, 4.2, 4.3, 4.4, 4.5,
                           5, 5.1, 5.2, 5.3, 5.4, 5.5,
-                          6, 6.1, 6.2, 6.3, 6.4]),
+                          6, 6.1, 6.2, 6.3, 6.4, 6.5]),
           extra: 'all',
         },
         sortingType: 'overallRarity',
@@ -998,6 +1008,8 @@ let FishTrain = function(){
 
       this.applyTheme(this.settings.theme);
       $('#theme-toggle .toggle').on('click', this, this.themeButtonClicked);
+
+      $('#viewBaitButton').on('click', this, this.viewBaitClicked);
 
       // Validate the rider's pass first of course.
       var tcid = null;
@@ -2211,6 +2223,34 @@ let FishTrain = function(){
         console.debug("Aquarium may leak:", entry);
       }
       delete this.fishEntries[k];
+    }
+
+    getTackleBoxContents() {
+      function compareBaitEntries(a, b) {
+        if (a.itemData.ilvl == b.itemData.ilvl) {
+          return a.id < b.id ? -1 : 1;
+        } else {
+          return a.itemData.ilvl < b.itemData.ilvl ? 1 : -1;
+        }
+      }
+      let baitEntries = _(this.scheduleEntries).chain()
+        .map(x => x.fishEntry)
+        .reduce((memo, fish) => _.union(memo, [fish], fish.intuitionEntries), [])
+        .map((fish) => fish.bait[0])
+        .filter(x => x)
+        .unique(x => x.id)
+        .value();
+      return baitEntries.toSorted(compareBaitEntries);
+    }
+
+    viewBaitClicked(e) {
+      e.stopPropagation();
+      let _this = e.data;
+
+      let baitItems = _this.getTackleBoxContents();
+
+      $('#tackleBoxModal .bait-items').empty().append($(_this.templates.tackleBoxBaitItems(baitItems)));
+      $('#tackleBoxModal').modal('show');
     }
 
     onFishEntryShowLocationClicked(e) {

@@ -141,6 +141,9 @@ let FishTrain = function(){
         {{?it.data.snagging}}
           <div class="ui middle aligned status-icon sprite-icon sprite-icon-status-snagging" title="Snagging"></div>
         {{?}}
+        {{?it.data.lure}}
+          <div class="ui middle aligned status-icon sprite-icon sprite-icon-action-{{=it.data.lure.toLowerCase()}}_lure" title="{{=it.data.lure}} Lure"></div>
+        {{?}}
         {{?it.data.gig}}
           {{?it.data.gig === "UNKNOWN"}}
             <span>Spearfishing</span>
@@ -256,6 +259,9 @@ let FishTrain = function(){
         {{?it.data.snagging}}
           <div class="ui middle aligned status-icon sprite-icon sprite-icon-status-snagging" title="Snagging"></div>
         {{?}}
+        {{?it.data.lure}}
+          <div class="ui middle aligned status-icon sprite-icon sprite-icon-action-{{=it.data.lure.toLowerCase()}}_lure" title="{{=it.data.lure}} Lure"></div>
+        {{?}}
         {{?it.data.gig}}
           {{?it.data.gig === "UNKNOWN"}}
             <span>Spearfishing</span>
@@ -369,6 +375,9 @@ let FishTrain = function(){
           {{?it.data.snagging}}
             <div class="ui middle aligned status-icon sprite-icon sprite-icon-status-snagging" title="Snagging"></div>
           {{?}}
+          {{?it.data.lure}}
+            <div class="ui middle aligned status-icon sprite-icon sprite-icon-action-{{=it.data.lure.toLowerCase()}}_lure" title="{{=it.data.lure}} Lure"></div>
+          {{?}}
           {{?it.data.gig}}
             {{?it.data.gig === "UNKNOWN"}}
               <span>Spearfishing</span>
@@ -453,6 +462,9 @@ let FishTrain = function(){
           {{?it.data.snagging}}
             <div class="ui middle aligned status-icon sprite-icon sprite-icon-status-snagging" title="Snagging"></div>
           {{?}}
+          {{?it.data.lure}}
+            <div class="ui middle aligned status-icon sprite-icon sprite-icon-action-{{=it.data.lure.toLowerCase()}}_lure" title="{{=it.data.lure}} Lure"></div>
+          {{?}}
           {{?it.data.gig}}
             {{?it.data.gig === "UNKNOWN"}}
               <span>Spearfishing</span>
@@ -511,6 +523,16 @@ let FishTrain = function(){
 
   class BaitEntry {
     constructor(itemId) {
+      // CHECK IF INPUT IS AN ARRAY FIRST!!!
+      // TODO: Dedup with Fish object?!
+      this.alternatives = null;
+      if (Array.isArray(itemId)) {
+        if (window.ALLOW_MULTI_BAIT === true) {
+          this.alternatives = itemId.slice(1).map(x => new BaitEntry(x));
+        }
+        itemId = itemId[0];
+      }
+
       this.id = itemId;
       // Wrap the item data using reference.
       this.itemData = DATA.ITEMS[itemId];
@@ -601,6 +623,7 @@ let FishTrain = function(){
 
       let crs_idx = 0;
 
+      try{ _(crs).first().start } catch { this.active = false; return; }
       // Is the fish going to be up AT ALL during any interval?!
       let eEndOfIntervals = eorzeaTime.toEorzea(dateFns.add(_(intervals).last(), duration));
       if (dateFns.isSameOrAfter(_(crs).first().start, eEndOfIntervals)) {
@@ -890,7 +913,8 @@ let FishTrain = function(){
                           3, 3.1, 3.2, 3.3, 3.4, 3.5,
                           4, 4.1, 4.2, 4.3, 4.4, 4.5,
                           5, 5.1, 5.2, 5.3, 5.4, 5.5,
-                          6, 6.1, 6.2, 6.3, 6.4, 6.5]),
+                          6, 6.1, 6.2, 6.3, 6.4, 6.5,
+                          7,]),
           extra: 'all',
         },
         sortingType: 'overallRarity',
@@ -917,6 +941,9 @@ let FishTrain = function(){
 
       // Load the settings for this tool.
       this.loadSettings();
+
+      // Apply templates.
+      Templates.applyTemplates();
 
       // Fish entries for the timeline.
       // In order to calculate rarity, we need to check everything (otherwise

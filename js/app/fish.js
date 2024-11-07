@@ -2,6 +2,23 @@ function shouldLogForFish(fish) {
   return false;
 }
 
+function _convertBait(baitList) {
+  // The FIRST entry MIGHT be an array. If so, the FIRST entry is the preferred, all
+  // remaining entries are considered alternative baits.
+  if (baitList === undefined || baitList === null) {
+    return [];
+  }
+  if (Array.isArray(baitList[0])) {
+    if (window.ALLOW_MULTI_BAIT === true) {
+      return [baitList[0].map(x => DATA.ITEMS[x])].concat(baitList.slice(1).map(x => DATA.ITEMS[x]));
+    } else {
+      return [DATA.ITEMS[baitList[0][0]]].concat(baitList.slice(1).map(x => DATA.ITEMS[x]));
+    }
+  } else {
+    return baitList.map(x => DATA.ITEMS[x]);
+  }
+}
+
 class Fish {
   constructor(fishData) {
     // Copy constructor version.
@@ -35,6 +52,14 @@ class Fish {
           spearfishing: spearfishing,
           coords: coords,
         };
+      } else if([147,148,149,150,151,152,153,154].includes(fishData.location)){ /* special case for diadem */
+        this.location = {
+          id: fishData.location, 
+          name: __p(fishingSpot, "name"), 
+          zoneId: 512,
+          zoneName: __p(DATA.ZONES[DATA.WEATHER_RATES["512"].zone_id], "name"), 
+          spearfishing: false
+        };
       } else {
         this.location = {name: '', zoneName: '', id: 0, zoneId: 0, coords: null, spearfishing: false};
       }
@@ -60,7 +85,7 @@ class Fish {
                  name: __p(DATA.ITEMS[x[0]], "name"),
                  icon: DATA.ITEMS[x[0]].icon };
       }),
-      path: _(this.bestCatchPath).map((x) => DATA.ITEMS[x])
+      path: _convertBait(this.bestCatchPath)
     };
     this.alwaysAvailable =
       this.weatherSet.length == 0 && this.startHour == 0 && this.endHour == 24;

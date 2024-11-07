@@ -10,13 +10,12 @@ pyvirt/
 # NPM
 node_modules/
 
-# Github Pages artifacts
-_site/
-Gemfile.lock
+# Github Pages deployment folder
+dist/
 
 # Other stuff
 .deploy/
-private/
+public/
 uploaded/
 *.log
 

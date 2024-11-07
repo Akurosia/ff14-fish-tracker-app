@@ -1,0 +1,1080 @@
+/*
+ * NOTE:
+ * Since I use background-image sprite trick, the only way to scale any image
+ * is via the `transform: scale` style. This DOES NOT affect the CSS box layout.
+ * Therefore, you must assign the `margin` for the node to specifically deal with
+ * scaling in order to prevent extra margins, or not enough margins.
+ *
+ * Use the formula: ((H * sH) - H) / 2 for height and width.
+ */
+
+.main.container {
+  padding-top: 3em;
+  padding-bottom: 3em;
+}
+
+span.catchtime-hour {
+  /* no special style */
+}
+span.catchtime-minute {
+  /* font-variant-position: super; */
+  vertical-align: super;
+  font-size: x-small;
+}
+
+.sprite-icon {
+  display: inline-block;
+}
+
+*.ui[class*="middle aligned"] {
+  vertical-align: middle;
+}
+
+.fish-icon.small.sprite-icon,
+.small-fish-icons .fish-icon.sprite-icon {
+  transform-origin: center;
+  transform: scale(0.50);
+  margin: -11px; /* fish-icon sprites are 44x44 */
+}
+
+.weather-icon.sprite-icon {
+  transform-origin: center;
+  transform: scale(0.675);
+  margin: -5.85px; /* weather-icon sprites are 36x36 */
+}
+
+.bait-icon.sprite-icon {
+  position: relative;
+  z-index: 2;
+  transform-origin: center;
+  transform: scale(0.75);
+  margin: -5.5px; /* bait-icon sprites are 44x44 */
+}
+
+.bait-icon.sprite-icon.hookset-modifier-icon {
+  vertical-align: top;
+  position: relative;
+  z-index: 1;
+  transform-origin: center;
+  transform: scale(0.50) translate(-33.3%, -50%);
+  margin: -11px; /* hookset-modifier-icon sprites are 44x44 */
+}
+
+tr.fish-intuition-row .bait-icon.sprite-icon.hookset-modifier-icon,
+tr.fishtrain-fishentrydetails .bait-icon.sprite-icon.hookset-modifier-icon,
+#schedule-entry-details .bait-icon.sprite-icon.hookset-modifier-icon {
+  transform-origin: center;
+  transform: scale(0.50) translate(-33.3%, -50%);
+  margin: -11px; /* hookset-modifier-icon sprites are 44x44 */
+}
+
+/* Prevent hookset modifier from being separated. */
+span.bait-span {
+  white-space: nowrap;
+  padding-top: 6px;
+  padding-bottom: 6px;
+  padding-right: 3px;
+  display: inline-block;
+}
+
+/*
+ * This container sets the relative positioning for the badges displayed next to the fish.
+ * Remember, because the bait icons are "sprite" images, they technically have no content,
+ * and therefore place the next position in the very center of the icon.
+ */
+.bait-badge-container {
+  display: inline-block;
+  position: relative;
+  min-width: 0.75em;
+  height: 1em;
+}
+
+.bait-badge-container .bait-icon.sprite-icon.hookset-modifier-icon {
+  position: absolute;
+}
+
+.bait-badge-container .tug-indicator {
+  position: absolute;
+  display: inline-block;
+  transform: translate(-40%, 60%);
+
+  padding: 0.5em 0.3em 0.5em 0.5em;
+  line-height: 1em;
+  text-align: center;
+  font-size: 0.75rem;
+  border-top-left-radius: 250rem;
+  border-top-right-radius: 75rem;
+  border-bottom-right-radius: 125rem;
+  vertical-align: bottom;
+  width: 2.5em; /* this seems to line up nicely with hooksets */
+  font-family: sans-serif; /* this helps separate the !s better when small */
+  font-weight: bolder;
+
+  color: black;
+}
+
+.tug-indicator.light-tug-indicator {
+  background-color: dodgerblue;
+}
+
+.tug-indicator.medium-tug-indicator {
+  background-color: darkseagreen;
+}
+
+.tug-indicator.heavy-tug-indicator {
+  background-color: orangered;
+}
+
+tr.fish-intuition-row .fish-icon.sprite-icon,
+tr.fish-intuition-row .bait-icon.sprite-icon,
+tr.fishtrain-fishentrydetails .fish-icon.sprite-icon,
+tr.fishtrain-fishentrydetails .bait-icon.sprite-icon,
+#schedule-entry-details .fish-icon.sprite-icon,
+#schedule-entry-details .bait-icon.sprite-icon
+{
+  transform-origin: center;
+  transform: scale(0.675);
+  margin: -7.15px;
+}
+
+tr.fish-intuition-row .weather-icon.sprite-icon,
+.upcoming-windows-grid .window-weather-and-time .weather-icon.sprite-icon {
+  transform-origin: center;
+  transform: scale(0.50);
+  margin: -9px;
+}
+
+tr.fish-intuition-row .tug-indicator,
+tr.fishtrain-fishentrydetails .tug-indicator,
+#schedule-entry-details .tug-indicator {
+  /* Attempt to shrink the display a little */
+  font-size: 0.675rem;
+}
+
+img {
+  vertical-align: middle;
+}
+
+.floatThead-container-fishes {
+  background-color: white;
+}
+
+.intuition-count {
+  vertical-align: middle;
+  display: inline-grid;
+  font-size: larger;
+}
+
+.fish-predator {
+  float: left;
+}
+
+#theme-toggle .toggle {
+  cursor: pointer;
+}
+
+body:not(.dark) #theme-toggle .light-mode-toggle,
+body.dark #theme-toggle .dark-mode-toggle
+{
+  display: none;
+}
+
+/* Hide the actual text when dropdown is not active */
+#languageChoice.dropdown > .text span.text {
+  display: none;
+}
+
+/* In order to force the menu to display leftward, we have to trick UI */
+#languageChoice.dropdown > .loading.left.menu {
+  margin-left: 100rem; /* force to load leftward */
+  left: 0px !important;
+  right: auto !important;
+  display: block;
+}
+
+#languageChoice.dropdown > .left.menu {
+  display: none; /* because this is inside a .ui.menu, we have to fix this... */
+}
+#languageChoice.dropdown > .visible.left.menu {
+  display: block;
+}
+#languageChoice.dropdown .mini.menu {
+  font-size: 0.78571429rem;
+}
+
+.center.menu {
+  flex-grow: 1;
+  justify-content: center;
+}
+
+#fish-eyes-button.link.item {
+  /* Remove vertical padding. */
+  padding-top: unset;
+  padding-bottom: unset;
+}
+
+#fish-eyes-button.link.item .sprite-icon-status-fish_eyes,
+body.dark #fish-eyes-button.link.item .sprite-icon-status-fish_eyes {
+  filter: saturate(0);
+}
+#fish-eyes-button.link.item:hover .sprite-icon-status-fish_eyes,
+body.dark #fish-eyes-button.link.item:hover .sprite-icon-status-fish_eyes {
+  filter: saturate(1);
+}
+
+#fish-eyes-button.link.item.active {
+  background-color: rgb(0 0 0 / 10%) !important;
+  border-radius: 50%;
+}
+#fish-eyes-button.link.item.active .sprite-icon-status-fish_eyes,
+#fish-eyes-button.link.item.active:hover .sprite-icon-status-fish_eyes {
+  filter: drop-shadow(0px 0px 6px blue);
+}
+body.dark #fish-eyes-button.link.item.active {
+  background-color: rgb(255 255 255 / 10%) !important;
+}
+body.dark #fish-eyes-button.link.item.active .sprite-icon-status-fish_eyes,
+body.dark #fish-eyes-button.link.item.active:hover .sprite-icon-status-fish_eyes {
+  filter: drop-shadow(0px 0px 6px gold);
+}
+
+.upcoming-windows-button:hover {
+  cursor: pointer;
+}
+
+.alarm-cmd-button:hover {
+  cursor: pointer;
+}
+
+.upcoming-windows-grid {
+  display: grid;
+  grid-template-columns: 3fr 2fr 1fr 1fr;
+  grid-row-gap: 0.2rem;
+  grid-column-gap: 1rem;
+  grid-template-rows: auto repeat(10, auto);
+}
+
+.upcoming-windows-grid .header {
+  border-bottom: thin black solid;
+  font-weight: bold;
+}
+.inverted .upcoming-windows-grid .header {
+  border-bottom: thin white solid;
+}
+
+.upcoming-windows-grid .window-start {
+  font-weight: bold;
+}
+.upcoming-windows-grid .window-start,
+.upcoming-windows-grid .window-weather-and-time,
+.upcoming-windows-grid .window-duration,
+.upcoming-windows-grid .window-downtime {
+  white-space: nowrap;
+}
+
+.upcoming-windows-grid .window-weather-and-time i.arrow.right.icon {
+  vertical-align: middle;
+  margin-left: -0.25rem;
+  margin-right: -0.25rem;
+  font-size: 0.75rem;
+}
+
+.location-button:hover {
+  cursor: pointer;
+}
+
+#fishingSpotMapModal {
+  /* We need a little more control over the horizontal positioning please. */
+  margin-left: auto;
+  width: auto;
+  left: calc(50% - 256px);
+}
+#fishingSpotMapModal .map-container {
+  width: 512px;
+  height: 512px;
+  overflow: scroll;
+  overflow: -moz-scrollbars-none;
+  scrollbar-width: none; /* Firefox */
+  cursor: grab;
+  /* Override built-in settings for this */
+  padding: 0px;
+  background-color: transparent;
+  /* In order to properly support zooming, this must use "relative" position. */
+  position: relative;
+}
+#fishingSpotMapModal .map-container canvas {
+  /*
+   * In order to properly support zooming, the canvas uses "absolute" position.
+   * See https://stackoverflow.com/a/21305283 for an explaination why, but the
+   * basic problem is, by applying CSS transformations, it does not alter the
+   * actual layout size, and thus, when zooming out, the scroll size would remain
+   * the initial map size. But when the combination of relative/absolute is used,
+   * the transformation's effects are reflected in the scroll size, and we don't
+   * have to worry about scrolling off the map.
+   */
+   position: absolute;
+}
+
+#fishingSpotMapModal .map-container::-webkit-scrollbar {
+  display: none;
+}
+#fishingSpotMapModal .map-container.dragging {
+  cursor: grabbing;
+}
+#fishingSpotMapModal .map-container.loading {
+  cursor: progress;
+}
+
+
+#fishes thead tr th {
+  position: sticky;
+  top: 40px; /* This needs to sync with the top menu */
+  z-index: 3;
+  border-radius: unset;
+  background-color: hsla(0, 0%, 100%, 1) !important; /* This should match the page background */
+}
+
+#fishes.ui.selectable.table > tbody > tr,
+#fishes.ui.selectable.table > tr,
+#fishes.ui.table > tbody > tr > td.selectable,
+#fishes.ui.table > tr > td.selectable {
+  cursor: initial;
+}
+
+body.dark #fishes thead tr th {
+  background-color: hsla(0, 0%, 15%, 1) !important; /* This should match the page background */
+}
+
+#fishes.fish-eyes-enabled tr.fish-entry.fish-active.fish-unlimited td.fish-availability > span {
+  /* Blur the /text/ in the availablity cell when fish eyes is enabled. */
+  filter: blur(2px);
+  pointer-events: none;
+}
+
+/*
+ * These rules match the Intuition status requirement when a duration is present.
+ * CSS4 would allow us to use :has(> span) instead... but it's not ready yet :(
+ */
+tr.fish-entry .sprite-icon-status-intuition.has-duration {
+  margin-top: -6px;
+  /* Sometimes, we need some extra room... */
+  margin-left: 6px;
+  margin-right: 6px;
+}
+
+tr.fish-entry .sprite-icon-status-intuition.has-duration > span {
+  display: inline-block;
+  position: relative;
+  top: 26px;
+  width: 40px; /* 28 + 12 (to allow for longer text) */
+  white-space: nowrap;
+  text-align: center;
+  font-size: 12px;
+  margin-left: -6px;
+  margin-right: -6px;
+}
+
+tr.fish-entry.fish-intuition-row .sprite-icon-status-intuition.has-duration {
+  margin-left: 24px;
+  margin-top: auto;
+  margin-right: auto;
+  /* Use flexbox to control vertical alignment */
+  display: -webkit-inline-box;
+  display: -webkit-inline-flex;
+  display: -moz-inline-box;
+  display: -ms-inline-flexbox;
+  display: inline-flex;
+  -webkit-box-align: center;
+  -webkit-flex-align: center;
+  -ms-flex-align: center;
+  -webkit-align-items: center;
+  align-items: center;
+  -ms-flex-direction: row;
+  flex-direction: row;
+}
+
+tr.fish-entry.fish-intuition-row .sprite-icon-status-intuition.has-duration > span {
+  position: unset;
+  left: auto;
+  top: auto;
+  width: 24px;
+  text-align: right;
+  white-space: normal;
+  line-height: 14px;
+  margin-left: -24px;
+  margin-right: auto;
+}
+
+tr.fishtrain-fishentrydetails .sprite-icon-status-intuition.has-duration {
+
+}
+tr.fishtrain-fishentrydetails .sprite-icon-status-intuition.has-duration > span {
+  display: none;
+}
+
+/* Active, non-caught, non-pinned fish */
+.ui.striped.table > tr.fish-entry.fish-active:hover:not(.fish-caught):not(.fish-pinned),
+.ui.striped.table tbody tr.fish-entry.fish-active:hover:not(.fish-caught):not(.fish-pinned) {
+  background-color: hsla(180, 60%, 89%, 0.8) !important;
+}
+.ui.striped.table > tr.fish-entry.fish-active:hover:nth-child(2n):not(.fish-caught):not(.fish-pinned),
+.ui.striped.table tbody tr.fish-entry.fish-active:hover:nth-child(2n):not(.fish-caught):not(.fish-pinned) {
+  background-color: hsla(180, 100%, 89%, 0.8) !important;
+}
+.ui.striped.table > tr.fish-entry.fish-active:not(.fish-caught):not(.fish-pinned),
+.ui.striped.table tbody tr.fish-entry.fish-active:not(.fish-caught):not(.fish-pinned) {
+  background-color: hsla(180, 60%, 94%, 0.8) !important;
+}
+.ui.striped.table > tr.fish-entry.fish-active:nth-child(2n):not(.fish-caught):not(.fish-pinned),
+.ui.striped.table tbody tr.fish-entry.fish-active:nth-child(2n):not(.fish-caught):not(.fish-pinned) {
+  background-color: hsla(180, 100%, 94%, 0.8) !important;
+}
+
+/* Active, already caught fish */
+.ui.striped.table > tr.fish-entry.fish-active.fish-caught:hover,
+.ui.striped.table tbody tr.fish-entry.fish-active.fish-caught:hover {
+  background-color: hsla(150, 60%, 75%, 0.8) !important;
+}
+.ui.striped.table > tr.fish-entry.fish-active.fish-caught:hover:nth-child(2n),
+.ui.striped.table tbody tr.fish-entry.fish-active.fish-caught:hover:nth-child(2n) {
+  background-color: hsla(150, 100%, 75%, 0.8) !important;
+}
+.ui.striped.table > tr.fish-entry.fish-active.fish-caught,
+.ui.striped.table tbody tr.fish-entry.fish-active.fish-caught {
+  background-color: hsla(150, 60%, 80%, 0.8) !important;
+}
+.ui.striped.table > tr.fish-entry.fish-active.fish-caught:nth-child(2n),
+.ui.striped.table tbody tr.fish-entry.fish-active.fish-caught:nth-child(2n) {
+  background-color: hsla(150, 100%, 80%, 0.8) !important;
+}
+
+/* Non-active, caught fish */
+.ui.striped.table > tr.fish-entry.fish-caught:hover,
+.ui.striped.table tbody tr.fish-entry.fish-caught:hover {
+  background-color: hsla(120, 60%, 75%, 0.8) !important;
+}
+.ui.striped.table > tr.fish-entry.fish-caught:hover:nth-child(2n),
+.ui.striped.table tbody tr.fish-entry.fish-caught:hover:nth-child(2n) {
+  background-color: hsla(120, 100%, 75%, 0.8) !important;
+}
+.ui.striped.table > tr.fish-entry.fish-caught,
+.ui.striped.table tbody tr.fish-entry.fish-caught {
+  background-color: hsla(120, 60%, 80%, 0.8) !important;
+}
+.ui.striped.table > tr.fish-entry.fish-caught:nth-child(2n),
+.ui.striped.table tbody tr.fish-entry.fish-caught:nth-child(2n) {
+  background-color: hsla(120, 100%, 80%, 0.8) !important;
+}
+
+/* Active, pinned fish */
+.ui.striped.table > tr.fish-entry.fish-active.fish-pinned:hover,
+.ui.striped.table tbody tr.fish-entry.fish-active.fish-pinned:hover {
+  background-color: hsla(350, 60%, 83%, 0.8) !important;
+}
+.ui.striped.table > tr.fish-entry.fish-active.fish-pinned:hover:nth-child(2n),
+.ui.striped.table tbody tr.fish-entry.fish-active.fish-pinned:hover:nth-child(2n) {
+  background-color: hsla(350, 100%, 83%, 0.8) !important;
+}
+.ui.striped.table > tr.fish-entry.fish-active.fish-pinned,
+.ui.striped.table tbody tr.fish-entry.fish-active.fish-pinned {
+  background-color: hsla(350, 60%, 88%, 0.8) !important;
+}
+.ui.striped.table > tr.fish-entry.fish-active.fish-pinned:nth-child(2n),
+.ui.striped.table tbody tr.fish-entry.fish-active.fish-pinned:nth-child(2n) {
+  background-color: hsla(350, 100%, 88%, 0.8) !important;
+}
+
+/* Generic fish entry */
+.ui.striped.table > tr.fish-entry:hover,
+.ui.striped.table tbody tr.fish-entry:hover {
+  background-color: hsla(50, 65%, 90%, 0.8) !important;
+}
+.ui.striped.table > tr.fish-entry:hover:nth-child(2n),
+.ui.striped.table tbody tr.fish-entry:hover:nth-child(2n) {
+  background-color: hsla(50, 65%, 95%, 0.8) !important;
+}
+.ui.striped.table > tr.fish-entry,
+.ui.striped.table tbody tr.fish-entry {
+  background-color: hsla(0, 0%, 95%, 0.8) !important;
+}
+.ui.striped.table > tr.fish-entry:nth-child(2n),
+.ui.striped.table tbody tr.fish-entry:nth-child(2n) {
+  background-color: hsla(0, 0%, 100%, 0.8) !important;
+}
+
+/* Section Divider */
+.ui.striped.table > tr.section-divider:hover:not(.fish-entry),
+.ui.striped.table tbody tr.section-divider:hover:not(.fish-entry),
+.ui.striped.table > tr.section-divider:not(.fish-entry),
+.ui.striped.table tbody tr.section-divider:not(.fish-entry) {
+  background-color: hsl(0, 0%, 80%) !important;
+}
+
+/* Entry after the last pinned fish entry */
+.ui.table .fish-entry.entry-after-last-pinned-entry > td {
+  border-top: 2px solid red !important;
+}
+
+/* Entry after the last currently available fish entry */
+.ui.table .fish-entry.entry-after-last-active-entry > td {
+  border-top: 2px solid blue !important;
+}
+
+/* Entry after the last fish that's soon to come available */
+.ui.table .fish-entry.entry-after-last-upsoon-entry > td {
+  border-top: 2px solid black !important;
+}
+
+/*
+ * Fish Guide style rules
+ * NOTE: All rules MUST be bounded to .fish-guide to prevent matching against
+ * other UI elements. `.fish-entry` in particular is re-used here.
+ */
+
+.fish-guide {
+  display: grid;
+  row-gap: 1em;
+  column-gap: 2em;
+  grid-template-areas: "page-selector fish-info"
+                       "fish-grid-out fish-info";
+  grid-template-columns: min-content 1fr;
+  grid-template-rows: min-content 1fr;
+}
+/* Handle mobile devices in portrait orientation. */
+@media (max-width: 900px) {
+  .fish-guide {
+    grid-template-areas: "page-selector"
+                         "fish-grid-out"
+                         "fish-info";
+    grid-template-rows: min-content min-content minmax(min-content, 200px);
+  }
+}
+.fish-guide .page-selector {
+  grid-area: page-selector;
+  justify-self: center;
+  align-content: flex-start;
+}
+.fish-guide .tiny.menu .page-number.item {
+  /* This attempts to keep the item widths uniform */
+  min-width: 3.5em;
+}
+.fish-guide .fish-grid-out {
+  grid-area: fish-grid-out;
+  align-content: flex-start;
+  /* This attempts to keep the height fixed */
+  padding-bottom: 1.3em;
+}
+.fish-guide .fish-grid {
+  justify-content: center;
+  display: grid;
+  grid-gap: 2px;
+  grid-template-columns: repeat(10, max-content);
+}
+.fish-guide .fish-entry {
+  height: 46px;
+  width: 46px;
+  position: relative;
+}
+.fish-guide .fish-entry:not(.disabled),
+.fish-guide .fish-entry:not(.disabled) .ui.left.corner.label .icon {
+  cursor: pointer;
+}
+.fish-guide .fish-entry.selected {
+  border-radius: 8px;
+  background-color: yellow;
+}
+.fish-guide .fish-entry .fish-icon {
+  margin-top: 1px;
+  margin-left: 1px;
+}
+
+.fish-guide .fish-entry .ui.left.corner.label {
+  margin-top: 4px;
+  margin-left: 4px;
+  height: 3em;
+  width: 3em;
+  border-color: rgba(232, 232, 232, 0.20);
+}
+.fish-guide .fish-entry .ui.left.corner.label.hovering {
+  border-color: rgba(232, 232, 232, 0.50);
+}
+.fish-guide .fish-entry.caught .ui.left.corner.label {
+  border-color: rgba(33, 186, 69, 0.50);
+}
+.fish-guide .fish-entry.caught .ui.left.corner.label.hovering {
+  border-color: rgba(33, 186, 69, 0.75);
+}
+.fish-guide .fish-entry .ui.left.corner.label:after {
+  border-top-width: 3em;
+  border-right-width: 3em;
+}
+.fish-guide .fish-entry .ui.left.corner.label .icon {
+  left: -0.5240714em;
+  top: 0.4821429em;
+  right: 0.5240714em;
+}
+.fish-guide .fish-entry.disabled .ui.left.corner.label {
+  display: none;
+}
+
+.fish-guide .fish-info {
+  grid-area: fish-info;
+  align-content: flex-start;
+  display: grid;
+  grid-gap: 1em;
+  grid-template-areas: "fish-name      fish-name"
+                       "fish-level     fish-waters"
+                       "fish-desc      fish-desc"
+                       "fish-locations fish-meta"
+                       "fish-extra     fish-meta";
+  grid-template-columns: repeat(2, 1fr);
+  grid-template-rows: 1fr 1fr minmax(min-content, 6fr) 3fr 3fr;
+}
+.fish-guide .fish-info.hidden {
+  display: none;
+}
+.fish-guide .fish-info .heading {
+  font-size: 125%;
+}
+.fish-guide .fish-name {
+  grid-area: fish-name;
+  font-size: 140%;
+  font-weight: bold;
+}
+.fish-guide .fish-level {
+  grid-area: fish-level;
+}
+.fish-guide .fish-waters {
+  grid-area: fish-waters;
+}
+.fish-guide .fish-desc {
+  grid-area: fish-desc;
+}
+.fish-guide .fish-locations {
+  grid-area: fish-locations;
+}
+.fish-guide .fish-extra {
+  grid-area: fish-extra;
+}
+.fish-guide .fish-meta {
+  grid-area: fish-meta;
+}
+
+.ui.accordion .title.active .inactive-details {
+  display: none;
+}
+
+/* Fish Train - Fish Table styles */
+
+.fishtrain-fishtable {
+  display: flex;
+  flex-direction: column;
+  max-width: 100%;
+}
+.fishtrain-fishtable .scroll-context {
+  flex-grow: 1;
+  overflow: auto;
+  max-width: min-content;
+  /*
+   * TODO: Configure these to display a min/max of 5/10 rows
+   * Or make the choice user-selectable (5, 10, 20?) We just
+   * don't want the table to take up the entire available
+   * screen, so max should always prevent this, while min (or
+   * plain height) should follow the user's preference.
+   */
+  min-height: 25vh;
+  max-height: 50vh;
+}
+table#fishtrain {
+  /*
+   * prevents the table from being full-sized and ugly
+   * j.k. it's actually pretty ugly looking already but without this
+   * it definitely looks a lot worse when given the default options.
+   */
+  width: unset;
+}
+
+table#fishtrain thead tr > th {
+  border-top-left-radius: unset;
+  border-top-right-radius: unset;
+  position: sticky;
+  top: 0;
+  z-index: 2;
+  white-space: normal;
+}
+table.inverted#fishtrain thead tr > th {
+  background-color: hsl(0, 0%, 15%);
+}
+table#fishtrain thead tr > th.sticky {
+  top: 0;
+  left: 0;
+  z-index: 3;
+}
+table#fishtrain thead tr > th.sticky.col-fish,
+table#fishtrain tbody tr > td.sticky.col-fish {
+  min-width: 22vw;
+}
+table#fishtrain thead tr > th.sticky.col-location,
+table#fishtrain tbody tr > td.sticky.col-location {
+  left: 22vw;
+}
+table#fishtrain tbody tr > td.sticky {
+  position: sticky;
+  left: 0;
+  z-index: 1;
+}
+table.inverted#fishtrain tbody tr > td.sticky {
+  background-color: #333;
+}
+
+table#fishtrain .fishtrain-fishentry-interval {
+  min-width: 5rem;
+  max-width: 5rem;
+  position: relative;
+  padding: 0;
+}
+table#fishtrain .fishtrain-fishentry-interval .weather-indicator-outer {
+  text-align: center;
+  display: none;
+}
+table#fishtrain.show-weather .fishtrain-fishentry-interval .weather-indicator-outer {
+  display: block;
+}
+table#fishtrain.show-weather .fishtrain-fishentry-interval .weather-indicator-outer .weather-icon {
+  margin-bottom: 5.85px;
+}
+table#fishtrain.show-weather .fishtrain-fishentry-interval .weather-indicator-outer .previous-weather {
+  display: none;
+}
+table#fishtrain.show-weather .fishtrain-fishentry-interval .weather-indicator-outer .previous-weather i.icon {
+  display: inline;
+  top: -3px;
+  position: relative;
+}
+table#fishtrain.show-weather.show-previous-weather-all .fishtrain-fishentry-interval .weather-indicator-outer .previous-weather {
+  display: inline-block;
+}
+table#fishtrain.show-weather.show-previous-weather-first .first.fishtrain-fishentry-interval .weather-indicator-outer .previous-weather {
+  display: inline-block;
+}
+table#fishtrain .fishtrain-fishentry-interval .interval-indicator {
+  height: 50%;
+  background-color: lightgreen;
+  display: block;
+  position: absolute;
+  left: 0px;
+  top: 25%;
+  cursor: pointer;
+}
+table#fishtrain.show-weather .fishtrain-fishentry-interval .interval-indicator {
+  height: 40%;
+  top: 60%;
+}
+table#fishtrain .fishtrain-fishentry-interval .interval-indicator:hover {
+  background-color: darkgoldenrod;
+}
+body.dark table#fishtrain .fishtrain-fishentry-interval .interval-indicator {
+  background-color: green;
+}
+body.dark table#fishtrain .fishtrain-fishentry-interval .interval-indicator:hover {
+  background-color: gold;
+}
+td.fishtrain-fishentry-interval.has-window {
+  background-color: rgb(0 255 0 / 10%);
+}
+.fishtrain-fishentry td.sticky.col-fish {
+  cursor: pointer;
+}
+
+.fishtrain-fishentrydetails.hidden {
+  display: none;
+}
+.fishtrain-fishentrydetails td {
+  padding-left: 0px !important;
+  padding-right: 0px !important;
+  padding-top: 0px !important;
+  border-top-style: dashed !important;
+}
+.fishtrain-fishentrydetails .contents {
+  border-left: rgba(255,255,255,.1) solid 5px;
+  border-bottom: rgba(255,255,255,.1) solid 1px;
+  border-bottom-left-radius: 10px;
+  padding: .4em .6em
+}
+
+#timeline-window-details > .actions,
+#schedule-entry-details > .actions {
+  background: #f9fafb;
+  padding: 1rem 1rem;
+  border-top: 1px solid rgba(34,36,38,.15);
+  text-align: right;
+}
+
+body.dark #timeline-window-details > .actions,
+body.dark #schedule-entry-details > .actions {
+  background: #191a1b;
+  border-top: 1px solid rgba(34,36,38,.85);
+  color: #fff;
+}
+
+/* Fish Train Schedule Bar Styles */
+
+.ui.fishtrain-schedule.segment {
+  /* max-width: 100%; */
+  position: relative;
+  border-radius: 10px;
+}
+body.dark .ui.fishtrain-schedule.segment > .ui.label {
+  background-color: #2f3032;
+  border-color: #767676;
+  border-bottom-width: 1px;
+  color: #fff;
+}
+.ui.fishtrain-schedule.segment .scroll-context {
+  overflow-x: auto;
+  overflow-y: hidden;
+  /*min-width: 1200px;*/ /* minimum 3hrs (each minute ~= 6px) */
+  max-width: 100%; /* bounds the contents */
+  height: 85px; /* makes up for interval-marker bounding box not counting for enough */
+  position: relative; /* creates a new box to overlay items on */
+  padding-top: 4px; /* gives a little extra space from the label */
+}
+
+.ui.fishtrain-schedule.segment .current-time-indicator-bar {
+  width: 100%; /* adjust based on size of bar */
+  position: absolute;
+  left: 0px;
+  top: 0px;
+  overflow: hidden;
+}
+.ui.fishtrain-schedule.segment .current-time-indicator-bar .current-time-indicator {
+  position: relative;
+  left: -100px; /* starts out of view */
+  width: 100px;
+  height: 60px;
+  border-top-right-radius: 5px;
+  border-bottom-right-radius: 5px;
+  background: linear-gradient(90deg, rgba(252,240,48,0) 0%, rgba(252,240,48,0.25) 75%, rgba(252,240,48,0.5) 100%)
+}
+
+.ui.fishtrain-schedule.segment .bar {
+  height: 4px;
+  margin-top: 23px;
+  margin-bottom: 23px;
+  background-color: hsl(0, 0%, 85%);
+  border-radius: 2px;
+  position: absolute;
+  width: max-content;
+}
+body.dark .ui.fishtrain-schedule.segment .bar {
+  background-color: hsl(0, 0%, 25%);
+}
+.ui.fishtrain-schedule.segment .bar .interval-marker {
+  display: inline-block;
+  width: 179px; /* 30m minus border */
+  border-right: 1px dashed grey;
+  height: 27px;
+  padding-bottom: 1.2rem;
+  margin-right: -0.185em; /* this seems to fix space between intervals... */
+}
+body.dark .ui.fishtrain-schedule.segment .bar .interval-marker {
+  border-right: 1px dashed white;
+}
+/* 6px = 1min */
+.ui.fishtrain-schedule.segment .bar.interval-10min .interval-marker {
+  width: 59px;
+}
+.ui.fishtrain-schedule.segment .bar.interval-15min .interval-marker {
+  width: 89px;
+}
+.ui.fishtrain-schedule.segment .bar.interval-20min .interval-marker {
+  width: 119px;
+}
+.ui.fishtrain-schedule.segment .bar.interval-30min .interval-marker {
+  width: 179px;
+}
+.ui.fishtrain-schedule.segment .bar.interval-60min .interval-marker {
+  width: 359px;
+}
+.ui.fishtrain-schedule.segment .bar.interval-8bells .interval-marker {
+  width: 139px;
+}
+.ui.fishtrain-schedule.segment .bar .interval-marker > .label {
+  margin-left: calc(100% - 2.5em);
+  width: 5em;
+  text-align: center;
+  font-size: small;
+  margin-top: 27px;
+}
+body.dark .ui.fishtrain-schedule.segment .bar .interval-marker > .label {
+  color: white;
+}
+.ui.fishtrain-schedule.segment .items {
+  height: 50px;
+}
+.ui.fishtrain-schedule.segment .items.small-fish-entries {
+  padding-top: 10px;
+  padding-bottom: 10px;
+}
+.ui.fishtrain-schedule.segment .items .fish-entry {
+  position: absolute;
+  min-width: 50px;
+  width: 50px;
+  height: 50px;
+  border-radius: 8px;
+  background-color: hsl(0, 0%, 75%);
+  padding: 2px;
+  border-left: black 1px solid;
+  border-right: black 1px solid;
+  cursor: pointer;
+}
+body.dark .ui.fishtrain-schedule.segment .items .fish-entry {
+  background-color: hsl(0, 0%, 40%);
+}
+.ui.fishtrain-schedule.segment .items.small-fish-entries .fish-entry {
+  min-width: 30px;
+  width: 30px;
+  height: 30px;
+  border-radius: 4px;
+  background-color: hsl(0, 0%, 75%);
+  padding: 4px;
+}
+
+/* Fish Train Schedule List styles */
+/* This is pretty much identical to normal tracker rows */
+.ui.fishtrain-schedule-list.segment {
+  position: relative;
+  border-radius: 10px;
+}
+.ui.fishtrain-schedule-list.segment .scroll-context {
+  overflow-x: hidden;
+  overflow-y: auto;
+  width: max-content; /* bounds the contents */
+  max-height: calc(1rem + (5 * 59.5px));
+}
+.fishtrain-schedule-list thead tr th {
+  position: sticky;
+  top: 0;
+  z-index: 3;
+  border-top-left-radius: unset !important;
+  border-top-right-radius: unset !important;
+  background-color: hsla(0, 0%, 100%, 1) !important; /* This should match the page background */
+}
+body.dark .fishtrain-schedule-list thead tr th {
+  background-color: hsla(0, 0%, 15%, 1) !important; /* This should match the page background */
+}
+.fishtrain-schedule-list thead tr th.fish-name-col {
+  min-width: 20rem;
+}
+.fishtrain-schedule-list thead tr th.fish-availability-col {
+  min-width: 8.5rem;
+}
+.fishtrain-schedule-list thead tr th.fish-location-col {
+  min-width: 20rem;
+}
+.fishtrain-schedule-list thead tr th.fish-requirements-col {
+  min-width: 15rem;
+}
+
+/* Styles for fish entries */
+tr.fish-entry td.fish-icon-and-name span.fish-name,
+tr.fish-entry td.fish-icon-and-name span.fish-details {
+  display: block;
+}
+.ui.table > tbody > tr.fish-entry.fish-intuition-row > td.fish-icon-and-name {
+  padding-left: 1.25em;
+}
+tr.fish-entry.fish-intuition-row td.fish-icon-and-name span.fish-name {
+  display: inline-block;
+  vertical-align: middle;
+}
+tr.fish-entry td.fish-location .fishing-spot,
+tr.fish-entry td.fish-location .zone {
+  display: block;
+}
+tr.fish-entry td.fish-location .zone {
+  font-size: smaller;
+}
+
+/* Expired row */
+.fishtrain-schedule-list .ui.table > tr.fish-entry.expired,
+.fishtrain-schedule-list .ui.table > tr.fish-entry.expired td,
+.fishtrain-schedule-list .ui.table tbody tr.fish-entry.expired,
+.fishtrain-schedule-list .ui.table tbody tr.fish-entry.expired td {
+  color: rgba(40,40,40,.3);
+}
+
+body.dark .fishtrain-schedule-list .ui.table > tr.fish-entry.expired,
+body.dark .fishtrain-schedule-list .ui.table > tr.fish-entry.expired td,
+body.dark .fishtrain-schedule-list .ui.table tbody tr.fish-entry.expired,
+body.dark .fishtrain-schedule-list .ui.table tbody tr.fish-entry.expired td {
+  color: hsla(0, 0%, 50%, 0.87) !important;
+}
+
+/* Prevent clicking on links in this row */
+.fishtrain-schedule-list tr.fish-entry.expired {
+  cursor: not-allowed;
+  pointer-events: none !important; /* prevent clicking: it's disabled */
+}
+/* Restore color of links */
+.fishtrain-schedule-list tr.fish-entry.expired a {
+  color: inherit;
+}
+/* Hide extra details */
+.fishtrain-schedule-list tr.fish-entry.expired span.fish-details,
+.fishtrain-schedule-list tr.fish-entry.expired td.fish-availability *,
+.fishtrain-schedule-list tr.fish-entry.expired td.fish-location *,
+.fishtrain-schedule-list tr.fish-entry.expired td.fish-requirements * {
+  display: none;
+}
+/* Use smaller, greyed out fish sprite */
+.fishtrain-schedule-list tr.fish-entry.expired td.fish-icon-and-name .fish-icon.sprite-icon {
+  transform-origin: right;
+  transform: scale(0.50);
+  filter: saturate(0);
+  transition: all 1s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  /* fish-icon sprites are 44x44 */
+  margin-top: -11px;
+  margin-bottom: -11px;
+}
+/* For intuition requirements, just hide them if their main fish is expired. */
+.fishtrain-schedule-list tr.fish-intuition-row.fish-entry.expired {
+  display: none;
+}
+
+/* Unless this is for passengers, do not display the caught status column. */
+.fishtrain-schedule-list:not(.passenger) td.fish-caughtStatus {
+  display: none;
+}
+
+/* For passengers, always allow clicking on the checklist button */
+.fishtrain-schedule-list.passenger tr.fish-entry.expired td.fish-caughtStatus {
+  cursor: auto;
+  pointer-events: auto;
+}
+
+#departure-message:not(.visible) {
+  display: none;
+}
+
+#site-last-update.update-available {
+  color: olive;
+}
+body.dark #site-last-update.update-available {
+  color: yellow;
+}
+#site-last-update.update-available a,
+#site-last-update.update-available a:hover {
+  color: currentColor;
+  text-decoration: underline;
+}
+
+/* Make filter patch settings easier to tell if it's selected */
+#filterPatch .ui.active.button:not(.patch-set) {
+  text-decoration-style: double;
+  text-decoration-line: underline;
+}
+
+a.plainlink {
+  color: inherit !important;
+}

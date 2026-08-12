@@ -15510,10 +15510,11 @@
   lure:
   snagging:
   patch: 7.55
+  dataMissing: true
 - name: Skyfrond
   location: Cenote Jayunja
   startHour: 16
-  endHour: 24
+  endHour: 21
   previousWeatherSet:
   - Clear Skies
   weatherSet:
@@ -15567,7 +15568,7 @@
 - name: Triple Threat
   location: Canal Town North
   startHour: 8
-  endHour: 16
+  endHour: 13
   previousWeatherSet:
   - Clouds
   weatherSet:

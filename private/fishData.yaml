@@ -15478,91 +15478,107 @@
 # Patch 7.55 (2026-07-28)
 - name: Ner Lar Dor
   location: Karvarhur the First
-  startHour: 0
-  endHour: 24
+  startHour: 15
+  endHour: 16
   previousWeatherSet:
+  - Fog
   weatherSet:
+  - Wind
   bestCatchPath:
+  - Red Maggots
   predators:
-  tug:
-  hookset:
-  lure:
+  tug: heavy
+  hookset: Precision
+  lure: Modest
   snagging:
   patch: 7.55
-  dataMissing: true
 - name: Xehabopo'u
   location: Miyakabek'zu
-  startHour: 0
-  endHour: 24
+  startHour: 12
+  endHour: 15
   previousWeatherSet:
+  - Clouds
   weatherSet:
+  - Showers
   bestCatchPath:
+  - Golden Stonefly Nymph
+  - Driftwood Catfish
   predators:
     Driftwood Catfish: 6
-  tug:
-  hookset:
+  tug: heavy
+  hookset: Powerful
   lure:
   snagging:
   patch: 7.55
-  dataMissing: true
 - name: Skyfrond
   location: Cenote Jayunja
-  startHour: 0
+  startHour: 16
   endHour: 24
   previousWeatherSet:
+  - Clear Skies
   weatherSet:
+  - Rain
   bestCatchPath:
+  - Red Maggots
+  - Flawless Saucer
   predators:
     Moonmarking Saucer: 1
     Flawless Saucer: 3
-  tug:
-  hookset:
+  tug: heavy
+  hookset: Powerful
   lure:
   snagging:
   patch: 7.55
-  dataMissing: true
 - name: Rroneek Bichir
   location: Lake Toari
-  startHour: 0
+  startHour: 22
   endHour: 24
   previousWeatherSet:
+  - Fair Skies
   weatherSet:
+  - Dust Storms
   bestCatchPath:
+  - Popper Lure
+  - Niikwerepi Trout
+  - Ttokatoa
   predators:
-  tug:
-  hookset:
+  tug: heavy
+  hookset: Powerful
   lure:
   snagging:
   patch: 7.55
-  dataMissing: true
 - name: Great Ball of Lightning
   location: Alexandrian Ruins
-  startHour: 0
-  endHour: 24
+  startHour: 2
+  endHour: 4
   previousWeatherSet:
+  - Thunderstorms
   weatherSet:
+  - Umbral Static
   bestCatchPath:
+  - Red Maggots
   predators:
     Goldgrouper: 1
-  tug:
-  hookset:
+  tug: heavy
+  hookset: Powerful
   lure:
   snagging:
   patch: 7.55
-  dataMissing: true
 - name: Triple Threat
   location: Canal Town North
-  startHour: 0
-  endHour: 24
+  startHour: 8
+  endHour: 16
   previousWeatherSet:
+  - Clouds
   weatherSet:
+  - Fog
   bestCatchPath:
+  - Ghost Nipper
   predators:
     Shined Copper Shark: 1
     Copper Shark: 2
-  tug:
-  hookset:
+  tug: heavy
+  hookset: Powerful
   lure:
   snagging:
   patch: 7.55
-  dataMissing: true

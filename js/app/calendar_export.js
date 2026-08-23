@@ -133,6 +133,10 @@ let CalendarExport = function() {
       description.push('Bait: ' + bait);
     }
 
+    if (fish.video && fish.video.youtube) {
+      description.push('Video guide: https://youtu.be/' + fish.video.youtube);
+    }
+
     if (hasIntuition) {
       description.push("Intuition Requirements:");
       range.prerequisites.forEach(prerequisite => {

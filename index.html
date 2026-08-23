@@ -49,7 +49,7 @@
 
     <link rel="stylesheet" href="public/images/sprite.css?7.5_20260428_1005" />
     <link rel="stylesheet" href="css/semantic_ui_overrides.css?20260625_2159" />
-    <link rel="stylesheet" href="css/overlay.css?20260823_1441" />
+    <link rel="stylesheet" href="css/overlay.css?20260823_1546" />
     <link rel="stylesheet" href="css/dark_overlay.css?20260414_2133" />
 
     <script type="text/javascript" src="js/app/checkForUpdates.js?20221001_1235"></script>
@@ -104,7 +104,7 @@
           <tr>
             <th></th>
             <th>Name</th>
-            <th>Availability</th>
+            <th class="fish-availability-column">Availability</th>
             <th>Location</th>
             <th>Conditions</th>
             <th>Bait</th>
@@ -118,7 +118,7 @@
       <tr class="fish-entry{{?it.isWeatherRestricted}} fish-weather-restricted{{?}}{{?it.isCatchable}} fish-active{{?}}{{?it.isCaught || false}} fish-caught{{?}}{{?it.isPinned || false}} fish-pinned{{?}}{{?it.isUpSoon}} fish-bin-15{{?}}" data-id="{{=it.id}}">
         <!-- Buttons to marking fish as caught or pinned, etc -->
         <td class="collapsing">
-          <div class="ui middle aligned vertical mini very compact icon buttons">
+          <div class="ui middle aligned vertical mini very compact icon buttons fish-entry-actions">
             <div class="ui button fishCaught {{?it.isCaught || false}}green{{?}}">
               <i class="checkmark icon"></i>
             </div>
@@ -167,21 +167,16 @@
             {{?it.data.dataMissing !== false}}
               <i class="exclamation triangle icon" title="Unknown/Incomplete"></i>
             {{?}}
-            <span class="fish-availability-current" data-val="{{=it.availability.current.date}}" data-tooltip="{{var d = it.availability.current.date; if (d) { out += dateFns.formatRelative(d, Date.now()); } }}">
-              {{=it.availability.current.duration}}
-            </span><br/>
             <div class="fish-availability-details">
-              <i class="upcoming-windows-button calendar icon"></i>
-              <span style="white-space: nowrap !important">
-                <b>Uptime:</b>&nbsp;<span class="fish-availability-uptime">{{=(it.uptime * 100.0).toFixed(1)}}</span>%
-              </span>
-              <div class="fish-next-window">
-                <span style="white-space: nowrap !important">
-                  <b>Next:</b>&nbsp;<span class="fish-availability-upcoming" data-val="{{=it.availability.upcoming.date}}" data-prevclose="{{=it.availability.upcoming.prevdate}}" data-tooltip="{{var d = it.availability.upcoming.date; if (d) { out += dateFns.formatRelative(d, Date.now()); } }}">{{=it.availability.upcoming.downtime}}</span>
-                </span>
-                <div class="ui mini compact icon top right pointing dropdown button add-to-calendar-button"
+              <div class="ui middle aligned vertical mini very compact icon buttons fish-window-actions">
+                <button type="button" class="ui button upcoming-windows-button"
+                     aria-label="View upcoming windows" data-tooltip="View upcoming windows"
+                     data-position="left center" data-variation="mini">
+                  <i class="calendar outline icon"></i>
+                </button>
+                <div class="ui top right pointing dropdown button add-to-calendar-button"
                      role="button" tabindex="0" aria-label="Add next window to calendar"
-                     data-tooltip="Add next window to calendar" data-position="top center" data-variation="mini">
+                     data-tooltip="Add next window to calendar" data-position="left center" data-variation="mini">
                   <i class="calendar plus outline icon"></i>
                   <div class="menu" role="menu">
                     <a class="item google-calendar-action" href="#" target="_blank" rel="noopener" role="menuitem">
@@ -191,6 +186,19 @@
                       <i class="download icon"></i> Download .ics
                     </a>
                   </div>
+                </div>
+              </div>
+              <div class="fish-availability-summary">
+                <span class="fish-availability-current" data-val="{{=it.availability.current.date}}" data-tooltip="{{var d = it.availability.current.date; if (d) { out += dateFns.formatRelative(d, Date.now()); } }}">
+                  {{=it.availability.current.duration}}
+                </span>
+                <div class="fish-availability-secondary">
+                  <span style="white-space: nowrap !important">
+                    <b>Uptime:</b>&nbsp;<span class="fish-availability-uptime">{{=(it.uptime * 100.0).toFixed(1)}}</span>%
+                  </span>
+                  <span style="white-space: nowrap !important">
+                    <b>Next:</b>&nbsp;<span class="fish-availability-upcoming" data-val="{{=it.availability.upcoming.date}}" data-prevclose="{{=it.availability.upcoming.prevdate}}" data-tooltip="{{var d = it.availability.upcoming.date; if (d) { out += dateFns.formatRelative(d, Date.now()); } }}">{{=it.availability.upcoming.downtime}}</span>
+                  </span>
                 </div>
               </div>
             </div>
@@ -299,21 +307,16 @@
             {{?it.data.dataMissing !== false}}
               <i class="exclamation triangle icon" title="Unknown/Incomplete"></i>
             {{?}}
-            <span class="fish-availability-current" data-val="{{=it.availability.current.date}}" data-tooltip="{{var d = it.availability.current.date; if (d) { out += dateFns.formatRelative(d, Date.now()); } }}">
-              {{=it.availability.current.duration}}
-            </span><br/>
             <div class="fish-availability-details">
-              <i class="upcoming-windows-button calendar icon"></i>
-              <span style="white-space: nowrap !important">
-                <b>Uptime:</b>&nbsp;<span class="fish-availability-uptime">{{=(it.uptime * 100.0).toFixed(1)}}</span>%
-              </span>
-              <div class="fish-next-window">
-                <span style="white-space: nowrap !important">
-                  <b>Next:</b>&nbsp;<span class="fish-availability-upcoming" data-val="{{=it.availability.upcoming.date}}" data-prevclose="{{=it.availability.upcoming.prevdate}}" data-tooltip="{{var d = it.availability.upcoming.date; if (d) { out += dateFns.formatRelative(d, Date.now()); } }}">{{=it.availability.upcoming.downtime}}</span>
-                </span>
-                <div class="ui mini compact icon top right pointing dropdown button add-to-calendar-button"
+              <div class="ui middle aligned vertical mini very compact icon buttons fish-window-actions">
+                <button type="button" class="ui button upcoming-windows-button"
+                     aria-label="View upcoming windows" data-tooltip="View upcoming windows"
+                     data-position="left center" data-variation="mini">
+                  <i class="calendar outline icon"></i>
+                </button>
+                <div class="ui top right pointing dropdown button add-to-calendar-button"
                      role="button" tabindex="0" aria-label="Add next window to calendar"
-                     data-tooltip="Add next window to calendar" data-position="top center" data-variation="mini">
+                     data-tooltip="Add next window to calendar" data-position="left center" data-variation="mini">
                   <i class="calendar plus outline icon"></i>
                   <div class="menu" role="menu">
                     <a class="item google-calendar-action" href="#" target="_blank" rel="noopener" role="menuitem">
@@ -323,6 +326,19 @@
                       <i class="download icon"></i> Download .ics
                     </a>
                   </div>
+                </div>
+              </div>
+              <div class="fish-availability-summary">
+                <span class="fish-availability-current" data-val="{{=it.availability.current.date}}" data-tooltip="{{var d = it.availability.current.date; if (d) { out += dateFns.formatRelative(d, Date.now()); } }}">
+                  {{=it.availability.current.duration}}
+                </span>
+                <div class="fish-availability-secondary">
+                  <span style="white-space: nowrap !important">
+                    <b>Uptime:</b>&nbsp;<span class="fish-availability-uptime">{{=(it.uptime * 100.0).toFixed(1)}}</span>%
+                  </span>
+                  <span style="white-space: nowrap !important">
+                    <b>Next:</b>&nbsp;<span class="fish-availability-upcoming" data-val="{{=it.availability.upcoming.date}}" data-prevclose="{{=it.availability.upcoming.prevdate}}" data-tooltip="{{var d = it.availability.upcoming.date; if (d) { out += dateFns.formatRelative(d, Date.now()); } }}">{{=it.availability.upcoming.downtime}}</span>
+                  </span>
                 </div>
               </div>
             </div>
@@ -448,7 +464,7 @@
     <script type="text/javascript" src="js/app/baittally.js?20251111_1551"></script>
     <script type="text/javascript" src="js/app/map.js?20250310_2300"></script>
     <!-- NOTE: The ViewModel should be the last script loaded. -->
-    <script type="text/javascript" src="js/app/viewmodel.js?20260823_1441"></script>
+    <script type="text/javascript" src="js/app/viewmodel.js?20260823_1514"></script>
 
     <script type="text/javascript">
       $(() => {

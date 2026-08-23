@@ -242,24 +242,53 @@ body.dark #fish-eyes-button.link.item.active:hover .sprite-icon-status-fish_eyes
   cursor: pointer;
 }
 
-.fish-availability-details {
-  display: flex;
-  align-items: center;
-  flex-wrap: wrap;
-  gap: 0.2rem 0.5rem;
-  font-size: smaller;
+#fishes .fish-availability-column,
+#fishes td.fish-availability {
+  min-width: 17rem;
 }
 
-.fish-next-window {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.25rem;
+.fish-availability-current {
   white-space: nowrap;
 }
 
-.add-to-calendar-button.ui.button {
+.fish-availability-details {
+  display: inline-grid;
+  grid-template-columns: auto 1fr;
+  align-items: stretch;
+  gap: 0.6rem;
+}
+
+.fish-availability-summary {
+  display: grid;
+  grid-template-rows: repeat(2, 1fr);
+  align-items: center;
+  row-gap: 0.2rem;
+}
+
+.fish-availability-secondary {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  font-size: smaller;
+}
+
+.fish-window-actions.ui.buttons {
   margin: 0;
-  vertical-align: middle;
+}
+
+.fish-entry-actions.ui.buttons .button,
+.fish-window-actions.ui.buttons .button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.fish-entry-actions.ui.icon.buttons .button > .icon,
+.fish-window-actions.ui.icon.buttons .button > .icon {
+  width: 1em;
+  height: 1em;
+  margin: 0 !important;
+  line-height: 1;
 }
 
 .add-to-calendar-button.ui.dropdown > .menu {
@@ -267,16 +296,19 @@ body.dark #fish-eyes-button.link.item.active:hover .sprite-icon-status-fish_eyes
   min-width: max-content;
 }
 
-.add-to-calendar-button:focus-visible {
-  outline: 2px solid currentColor;
-  outline-offset: 2px;
+@supports selector(:has(.f)) {
+  .add-to-calendar-button.ui.pointing.dropdown:not(.upward) > .inverted.menu:has(:first-child:hover)::after {
+    background: #2d2e2f;
+  }
+
+  .add-to-calendar-button.ui.pointing.dropdown:not(.upward) > .inverted.menu:has(.selected.item:first-child)::after {
+    background: #3d3e3f;
+  }
 }
 
-@media (max-width: 900px) {
-  .add-to-calendar-button.ui.button {
-    min-width: 2.75rem;
-    min-height: 2.75rem;
-  }
+.fish-window-actions .button:focus-visible {
+  outline: 2px solid currentColor;
+  outline-offset: 2px;
 }
 
 .alarm-cmd-button:hover {

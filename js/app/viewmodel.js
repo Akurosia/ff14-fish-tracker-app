@@ -245,8 +245,21 @@ class FishEntry {
   }
 
   getNextCalendarEvent() {
-    const targetRange = this.data.catchableRanges[1];
-    if (targetRange === undefined) return null;
+    const ranges = this.data.catchableRanges;
+    const currentRange = ranges[0];
+    if (currentRange === undefined) {
+      return null;
+    }
+
+    // Remind the user about the upcoming window for the given fish, or the *next* window if it's already underway.
+    const currentStart = eorzeaTime.toEarth(+currentRange.start);
+    const targetRange = dateFns.isAfter(currentStart, Date.now())
+        ? currentRange
+        : ranges[1];
+
+    if (targetRange === undefined) {
+      return null;
+    }
 
     const observations = fishWatcher.getCatchableRangeObservations(this.data, targetRange);
     const calendarRange = CalendarExport.buildCalendarRange(
@@ -254,6 +267,7 @@ class FishEntry {
       targetRange,
       observations
     );
+
     return CalendarExport.buildFishEvent(this.data, calendarRange);
   }
 

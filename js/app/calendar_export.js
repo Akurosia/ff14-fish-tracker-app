@@ -146,7 +146,7 @@ let CalendarExport = function() {
         description.push(prerequisite.count + 'x ' + prerequisite.name + ' - ' + time +
             ' - Weather: ' + prerequisite.weather);
       });
-      description.push('The event starts when prerequisite prep is possible.');
+      description.push('The calendar event starts when intuition fish are available.');
     }
     description.push('Patch: ' + fish.patch);
 

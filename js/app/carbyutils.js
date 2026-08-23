@@ -28,7 +28,6 @@ let CarbyUtils = function(){
       _(Fishes).each(fish => {
         fish.catchableRanges = [];
         fish.incompleteRanges = [];
-        fishWatcher.clearFishCalendarTimes(fish);
       });
       let prevPeriod = startOfPeriod(dateFns.utc.subHours(eorzeaTime.toEorzea(datetime), 8));
       weatherService.insertForecast(prevPeriod, weatherService.calculateForecastTarget(eorzeaTime.toEarth(prevPeriod)));

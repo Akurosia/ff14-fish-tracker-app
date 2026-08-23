@@ -9,53 +9,10 @@ class FishWatcher {
     // Placeholder for fishEntries.
     this.fishEntries = null;
 
-    // Calendar event time ranges for intuition-based fish.
-    this.fishCalendarTimeRanges = new Map();
-
     // IMPORTANT!!!
     // The new view model does not regenerate templates every time. This means
     // we MUST NOT RACE the view model! We'll still schedule the updateFishes
     // function for every new bell, but let the view model do it please...
-  }
-
-  onFishCalendarTimeResolved(details) {
-    let observations = this.fishCalendarTimeRanges.get(details.fish);
-    if (observations === undefined) {
-      observations = [];
-      this.fishCalendarTimeRanges.set(details.fish, observations);
-    }
-    observations.push(details);
-  }
-
-  getFishCalendarTimes(fish, targetRange = null) {
-    const observations = this.fishCalendarTimeRanges.get(fish) || [];
-    if (targetRange === null) return observations.slice();
-    return observations.filter(observation =>
-      dateFns.areIntervalsOverlapping(observation.targetRange, targetRange)
-    );
-  }
-
-  clearFishCalendarTimes(fish) {
-    this.fishCalendarTimeRanges.delete(fish);
-  }
-
-  pruneFishCalendarTimes(fish) {
-    const retainedRanges = fish.catchableRanges.concat(fish.incompleteRanges || []);
-    if (retainedRanges.length === 0) {
-      this.clearFishCalendarTimes(fish);
-      return;
-    }
-
-    const observations = this.getFishCalendarTimes(fish).filter(observation =>
-      retainedRanges.some(range =>
-        dateFns.areIntervalsOverlapping(observation.targetRange, range)
-      )
-    );
-    if (observations.length === 0) {
-      this.clearFishCalendarTimes(fish);
-    } else {
-      this.fishCalendarTimeRanges.set(fish, observations);
-    }
   }
 
   setFishEyes(enabled, opts = {}) {
@@ -79,7 +36,6 @@ class FishWatcher {
     _(Fishes).chain().filter(fish => fish.fishEyes).each(fish => {
       fish.catchableRanges = [];
       fish.incompleteRanges = [];
-      this.clearFishCalendarTimes(fish);
       fish.notifyCatchableRangesUpdated();
     });
     // STEP 2: Toggle "Fish Eyes" mode.
@@ -142,7 +98,6 @@ class FishWatcher {
         fish.catchableRanges.shift();
         fish.notifyCatchableRangesUpdated();
       }
-      this.pruneFishCalendarTimes(fish);
     }
     console.timeEnd('cleanupFish');
 
@@ -181,7 +136,6 @@ class FishWatcher {
       fish.catchableRanges.shift();
       fish.notifyCatchableRangesUpdated();
     }
-    this.pruneFishCalendarTimes(fish);
 
     // PHASE 1:
     //   Ensure each fish has at least 'n' windows defined.
@@ -479,12 +433,8 @@ class FishWatcher {
     // and the window itself. Merge together bordering windows.
     var catchableRange = dateFns.intervalIntersection(nextRange, window);
     if (preparationStart === null) preparationStart = catchableRange.start;
+    catchableRange.preparationStart = preparationStart;
     fish.addCatchableRange(catchableRange);
-    this.onFishCalendarTimeResolved({
-      fish: fish,
-      targetRange: catchableRange,
-      preparationStart: preparationStart
-    });
     return dateFns.isWithinInterval(+window.end + 1, origNextRange);
   }
 }

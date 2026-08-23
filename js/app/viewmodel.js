@@ -261,11 +261,9 @@ class FishEntry {
       return null;
     }
 
-    const observations = fishWatcher.getFishCalendarTimes(this.data, targetRange);
     return CalendarExport.buildFishEvent(
       this.data,
-      targetRange,
-      observations
+      targetRange
     );
   }
 

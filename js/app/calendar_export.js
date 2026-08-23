@@ -43,27 +43,19 @@ let CalendarExport = function() {
         : formatEorzeaHour(fish.startHour) + '-' + formatEorzeaHour(fish.endHour) + ' ET';
   }
 
-  function buildFishEvent(fish, targetRange, observations) {
+  function buildFishEvent(fish, targetRange) {
     if (!fish || !targetRange) {
       return null;
     }
 
-    const matching = (observations || []).filter(observation =>
-      observation && observation.targetRange &&
-      dateFns.areIntervalsOverlapping(observation.targetRange, targetRange)
-    );
     const intuitionFish = fish.intuitionFish || [];
 
-    // If the legendary fish requires intuition, ensure that we have the prereq. data
-    // This check is to avoid making events too short to capture the "prep" fish before the actual big fish window
-    if (intuitionFish.length > 0 && matching.length === 0) {
+    // Preparation data is required for intuition fish
+    if (intuitionFish.length > 0 && targetRange.preparationStart === undefined) {
       return null;
     }
 
-    const preparationStart = matching.reduce(
-      (earliest, observation) => Math.min(earliest, +observation.preparationStart),
-      +targetRange.start
-    );
+    const preparationStart = targetRange.preparationStart || targetRange.start;
     const prerequisites = intuitionFish.map(intuition => ({
       name: intuition.data.name,
       count: intuition.count,

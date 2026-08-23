@@ -242,59 +242,6 @@ body.dark #fish-eyes-button.link.item.active:hover .sprite-icon-status-fish_eyes
   cursor: pointer;
 }
 
-#fishes .fish-availability-column,
-#fishes td.fish-availability {
-  min-width: 17rem;
-}
-
-.fish-availability-current {
-  white-space: nowrap;
-}
-
-.fish-availability-details {
-  display: inline-grid;
-  grid-template-columns: auto 1fr;
-  align-items: stretch;
-  gap: 0.6rem;
-}
-
-.fish-availability-summary {
-  display: grid;
-  grid-template-rows: repeat(2, 1fr);
-  align-items: center;
-  row-gap: 0.2rem;
-}
-
-.fish-availability-secondary {
-  display: flex;
-  align-items: center;
-  gap: 0.75rem;
-  font-size: smaller;
-}
-
-.fish-entry-actions.ui.buttons .button,
-.fish-window-actions.ui.buttons .button {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.fish-entry-actions.ui.icon.buttons .button > .icon,
-.fish-window-actions.ui.icon.buttons .button > .icon {
-  width: 1em;
-  height: 1em;
-}
-
-.add-to-calendar-button.ui.dropdown > .menu {
-  max-width: calc(100vw - 2rem);
-  min-width: max-content;
-}
-
-.fish-window-actions .button:focus-visible {
-  outline: 2px solid currentColor;
-  outline-offset: 2px;
-}
-
 .alarm-cmd-button:hover {
   cursor: pointer;
 }

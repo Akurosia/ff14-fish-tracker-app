@@ -261,14 +261,12 @@ class FishEntry {
       return null;
     }
 
-    const observations = fishWatcher.getCatchableRangeObservations(this.data, targetRange);
-    const calendarRange = CalendarExport.buildCalendarRange(
+    const observations = fishWatcher.getFishCalendarTimes(this.data, targetRange);
+    return CalendarExport.buildFishEvent(
       this.data,
       targetRange,
       observations
     );
-
-    return CalendarExport.buildFishEvent(this.data, calendarRange);
   }
 
   update(earthTime, full = false) {

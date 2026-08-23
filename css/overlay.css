@@ -296,16 +296,6 @@ body.dark #fish-eyes-button.link.item.active:hover .sprite-icon-status-fish_eyes
   min-width: max-content;
 }
 
-@supports selector(:has(.f)) {
-  .add-to-calendar-button.ui.pointing.dropdown:not(.upward) > .inverted.menu:has(:first-child:hover)::after {
-    background: #2d2e2f;
-  }
-
-  .add-to-calendar-button.ui.pointing.dropdown:not(.upward) > .inverted.menu:has(.selected.item:first-child)::after {
-    background: #3d3e3f;
-  }
-}
-
 .fish-window-actions .button:focus-visible {
   outline: 2px solid currentColor;
   outline-offset: 2px;

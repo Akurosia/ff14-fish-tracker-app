@@ -17,12 +17,6 @@ let CalendarExport = function() {
     return item ? item.name_en : String(itemId);
   }
 
-  function flattenValues(values) {
-    return values.reduce((result, value) => {
-      return result.concat(Array.isArray(value) ? flattenValues(value) : value);
-    }, []);
-  }
-
   function formatEorzeaHour(hour) {
     if (hour === 24) return '24:00';
     const wholeHour = Math.floor(hour);
@@ -40,7 +34,7 @@ let CalendarExport = function() {
   }
 
   function describeBait(fish) {
-    return Array.from(new Set(flattenValues(fish.bestCatchPath || []).map(itemName))).join(' -> ');
+    return Array.from(new Set((fish.bestCatchPath || []).flat(Infinity).map(itemName))).join(' -> ');
   }
 
   function describeEorzeaTime(fish) {
@@ -49,21 +43,14 @@ let CalendarExport = function() {
         : formatEorzeaHour(fish.startHour) + '-' + formatEorzeaHour(fish.endHour) + ' ET';
   }
 
-  function rangesOverlap(left, right) {
-    return +left.end > +right.start && +left.start < +right.end;
-  }
-
-  /**
-   * Combine FishWatcher observations to create an encompassing "catchable range".
-   * Timestamps returned are in Earth-time to create calendar events with.
-   */
-  function buildCalendarRange(fish, targetRange, observations) {
+  function buildFishEvent(fish, targetRange, observations) {
     if (!fish || !targetRange) {
       return null;
     }
 
     const matching = (observations || []).filter(observation =>
-      observation && observation.targetRange && rangesOverlap(observation.targetRange, targetRange)
+      observation && observation.targetRange &&
+      dateFns.areIntervalsOverlapping(observation.targetRange, targetRange)
     );
     const intuitionFish = fish.intuitionFish || [];
 
@@ -85,21 +72,8 @@ let CalendarExport = function() {
       weather: describeWeather(intuition.data)
     }));
 
-    return {
-      start: eorzeaTime.toEarth(preparationStart),
-      end: eorzeaTime.toEarth(+targetRange.end),
-      targetStart: eorzeaTime.toEarth(+targetRange.start),
-      prerequisites: prerequisites
-    };
-  }
-
-  function buildFishEvent(fish, range) {
-    if (!fish || !range) {
-      return null;
-    }
-
     const locationParts = [fish.location.zoneName, fish.location.name].filter(Boolean);
-    const hasIntuition = range.prerequisites.length > 0;
+    const hasIntuition = prerequisites.length > 0;
     const description = hasIntuition
         ? ['Target: ' + fish.name + ' - ' + describeEorzeaTime(fish), 'Weather: ' + describeWeather(fish)]
         : ['Eorzea time: ' + (fish.startHour === 0 && fish.endHour === 24
@@ -117,7 +91,7 @@ let CalendarExport = function() {
 
     if (hasIntuition) {
       description.push("Intuition Requirements:");
-      range.prerequisites.forEach(prerequisite => {
+      prerequisites.forEach(prerequisite => {
         const time = prerequisite.startHour === 0 && prerequisite.endHour === 24
             ? 'All day ET'
             : formatEorzeaHour(prerequisite.startHour) + '-' + formatEorzeaHour(prerequisite.endHour) + ' ET';
@@ -135,9 +109,9 @@ let CalendarExport = function() {
     return {
       fishId: fishId,
       title: fish.name + ' window',
-      start: range.start,
-      end: range.end,
-      targetStart: range.targetStart,
+      start: eorzeaTime.toEarth(preparationStart),
+      end: eorzeaTime.toEarth(+targetRange.end),
+      targetStart: eorzeaTime.toEarth(+targetRange.start),
       location: locationParts.join(' - '),
       description: description.join('\n')
     };
@@ -153,13 +127,6 @@ let CalendarExport = function() {
         .replace(/\r?\n/g, '\\n')
         .replace(/;/g, '\\;')
         .replace(/,/g, '\\,');
-  }
-
-  function normalizeCalendarSeparators(value) {
-    return String(value)
-        .replace(/[\u2010-\u2015\u2212]/g, '-')
-        .replace(/\u00d7/g, 'x')
-        .replace(/\u2192/g, '->');
   }
 
   function foldCalendarLine(line) {
@@ -194,12 +161,12 @@ let CalendarExport = function() {
       'DTSTAMP:' + formatUtcCalendarDate(Date.now()),
       'DTSTART:' + formatUtcCalendarDate(event.start),
       'DTEND:' + formatUtcCalendarDate(event.end),
-      'SUMMARY:' + escapeCalendarText(normalizeCalendarSeparators(event.title))
+      'SUMMARY:' + escapeCalendarText(event.title)
     ];
 
     if (event.location) lines.push('LOCATION:' + escapeCalendarText(event.location));
     if (event.description) {
-      lines.push('DESCRIPTION:' + escapeCalendarText(normalizeCalendarSeparators(event.description)));
+      lines.push('DESCRIPTION:' + escapeCalendarText(event.description));
     }
     lines.push('END:VEVENT');
     lines.push('END:VCALENDAR');
@@ -230,7 +197,6 @@ let CalendarExport = function() {
   }
 
   return {
-    buildCalendarRange: buildCalendarRange,
     buildFishEvent: buildFishEvent,
     createGoogleCalendarUrl: createGoogleCalendarUrl,
     downloadICalendar: downloadICalendar

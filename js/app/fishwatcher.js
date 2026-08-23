@@ -9,10 +9,8 @@ class FishWatcher {
     // Placeholder for fishEntries.
     this.fishEntries = null;
 
-    // Intuition preparation metadata for the catchable ranges currently held
-    // by each Fish. Calendar consumers use this without changing the ranges
-    // themselves, since Fish.addCatchableRange may merge adjacent intervals.
-    this.catchableRangeObservations = new Map();
+    // Calendar event time ranges for intuition-based fish.
+    this.fishCalendarTimeRanges = new Map();
 
     // IMPORTANT!!!
     // The new view model does not regenerate templates every time. This means
@@ -20,45 +18,43 @@ class FishWatcher {
     // function for every new bell, but let the view model do it please...
   }
 
-  onCatchableRangeResolved(details) {
-    let observations = this.catchableRangeObservations.get(details.fish);
+  onFishCalendarTimeResolved(details) {
+    let observations = this.fishCalendarTimeRanges.get(details.fish);
     if (observations === undefined) {
       observations = [];
-      this.catchableRangeObservations.set(details.fish, observations);
+      this.fishCalendarTimeRanges.set(details.fish, observations);
     }
     observations.push(details);
   }
 
-  getCatchableRangeObservations(fish, targetRange = null) {
-    const observations = this.catchableRangeObservations.get(fish) || [];
+  getFishCalendarTimes(fish, targetRange = null) {
+    const observations = this.fishCalendarTimeRanges.get(fish) || [];
     if (targetRange === null) return observations.slice();
     return observations.filter(observation =>
-      +observation.targetRange.end > +targetRange.start &&
-      +observation.targetRange.start < +targetRange.end
+      dateFns.areIntervalsOverlapping(observation.targetRange, targetRange)
     );
   }
 
-  clearCatchableRangeObservations(fish) {
-    this.catchableRangeObservations.delete(fish);
+  clearFishCalendarTimes(fish) {
+    this.fishCalendarTimeRanges.delete(fish);
   }
 
-  pruneCatchableRangeObservations(fish) {
+  pruneFishCalendarTimes(fish) {
     const retainedRanges = fish.catchableRanges.concat(fish.incompleteRanges || []);
     if (retainedRanges.length === 0) {
-      this.clearCatchableRangeObservations(fish);
+      this.clearFishCalendarTimes(fish);
       return;
     }
 
-    const observations = this.getCatchableRangeObservations(fish).filter(observation =>
+    const observations = this.getFishCalendarTimes(fish).filter(observation =>
       retainedRanges.some(range =>
-        +observation.targetRange.end > +range.start &&
-        +observation.targetRange.start < +range.end
+        dateFns.areIntervalsOverlapping(observation.targetRange, range)
       )
     );
     if (observations.length === 0) {
-      this.clearCatchableRangeObservations(fish);
+      this.clearFishCalendarTimes(fish);
     } else {
-      this.catchableRangeObservations.set(fish, observations);
+      this.fishCalendarTimeRanges.set(fish, observations);
     }
   }
 
@@ -83,7 +79,7 @@ class FishWatcher {
     _(Fishes).chain().filter(fish => fish.fishEyes).each(fish => {
       fish.catchableRanges = [];
       fish.incompleteRanges = [];
-      this.clearCatchableRangeObservations(fish);
+      this.clearFishCalendarTimes(fish);
       fish.notifyCatchableRangesUpdated();
     });
     // STEP 2: Toggle "Fish Eyes" mode.
@@ -146,7 +142,7 @@ class FishWatcher {
         fish.catchableRanges.shift();
         fish.notifyCatchableRangesUpdated();
       }
-      this.pruneCatchableRangeObservations(fish);
+      this.pruneFishCalendarTimes(fish);
     }
     console.timeEnd('cleanupFish');
 
@@ -185,7 +181,7 @@ class FishWatcher {
       fish.catchableRanges.shift();
       fish.notifyCatchableRangesUpdated();
     }
-    this.pruneCatchableRangeObservations(fish);
+    this.pruneFishCalendarTimes(fish);
 
     // PHASE 1:
     //   Ensure each fish has at least 'n' windows defined.
@@ -484,7 +480,7 @@ class FishWatcher {
     var catchableRange = dateFns.intervalIntersection(nextRange, window);
     if (preparationStart === null) preparationStart = catchableRange.start;
     fish.addCatchableRange(catchableRange);
-    this.onCatchableRangeResolved({
+    this.onFishCalendarTimeResolved({
       fish: fish,
       targetRange: catchableRange,
       preparationStart: preparationStart

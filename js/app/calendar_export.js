@@ -9,12 +9,12 @@ let CalendarExport = function() {
 
   function weatherName(weatherId) {
     const weather = DATA.WEATHER_TYPES[weatherId];
-    return weather ? weather.name_en : String(weatherId);
+    return weather ? __p(weather, 'name') : String(weatherId);
   }
 
   function itemName(itemId) {
     const item = DATA.ITEMS[itemId];
-    return item ? item.name_en : String(itemId);
+    return item ? __p(item, 'name') : String(itemId);
   }
 
   function formatEorzeaHour(hour) {

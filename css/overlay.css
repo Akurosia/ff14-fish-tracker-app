@@ -278,6 +278,13 @@ body.dark #fish-eyes-button.link.item.active:hover .sprite-icon-status-fish_eyes
   align-items: center;
   justify-content: center;
 }
+
+.fish-entry-actions.ui.icon.buttons .button > .icon,
+.fish-window-actions.ui.icon.buttons .button > .icon {
+  width: 1em;
+  height: 1em;
+}
+
 .add-to-calendar-button.ui.dropdown > .menu {
   max-width: calc(100vw - 2rem);
   min-width: max-content;

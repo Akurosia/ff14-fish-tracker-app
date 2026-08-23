@@ -1041,7 +1041,7 @@ let ViewModel = new class {
           .replace(/[-:]/g, '')
           .replace(/\.\d{3}/, '');
       const filename = 'ffxiv-fish-' + event.fishId + '-' + targetStart + '.ics';
-      CalendarExport.downloadICalendar([event], filename);
+      CalendarExport.downloadICalendar(event, filename);
       $dropdown.dropdown('hide');
     });
 

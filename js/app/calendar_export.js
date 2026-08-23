@@ -1,7 +1,6 @@
 // Shared helpers for calendar event exports.
 
 let CalendarExport = function() {
-  const REMINDER_OPTIONS = [null, 5, 10, 15, 30, 60];
   const encoder = new TextEncoder();
 
   function pad2(value) {
@@ -78,39 +77,18 @@ let CalendarExport = function() {
       (earliest, observation) => Math.min(earliest, +observation.preparationStart),
       +targetRange.start
     );
-    const prerequisites = intuitionFish.map(intuition => {
-      const prerequisiteObservations = matching
-          .flatMap(observation => observation.prerequisites || [])
-          .filter(prerequisite => prerequisite.fish.id === intuition.data.id);
-      if (prerequisiteObservations.length === 0) {
-        return null;
-      }
-
-      return {
-        fishId: intuition.data.id,
-        name: intuition.data.name,
-        count: intuition.count,
-        startHour: intuition.data.startHour,
-        endHour: intuition.data.endHour,
-        weather: describeWeather(intuition.data),
-        alwaysAvailable: prerequisiteObservations.some(prerequisite => prerequisite.alwaysAvailable),
-        acceptedRanges: prerequisiteObservations
-            .filter(prerequisite => prerequisite.range !== null)
-            .map(prerequisite => ({
-              start: eorzeaTime.toEarth(+prerequisite.range.start),
-              end: eorzeaTime.toEarth(+prerequisite.range.end)
-            }))
-      };
-    });
-    if (prerequisites.some(prerequisite => prerequisite === null)) {
-      return null;
-    }
+    const prerequisites = intuitionFish.map(intuition => ({
+      name: intuition.data.name,
+      count: intuition.count,
+      startHour: intuition.data.startHour,
+      endHour: intuition.data.endHour,
+      weather: describeWeather(intuition.data)
+    }));
 
     return {
       start: eorzeaTime.toEarth(preparationStart),
       end: eorzeaTime.toEarth(+targetRange.end),
       targetStart: eorzeaTime.toEarth(+targetRange.start),
-      targetEnd: eorzeaTime.toEarth(+targetRange.end),
       prerequisites: prerequisites
     };
   }
@@ -156,13 +134,10 @@ let CalendarExport = function() {
         : fish.id;
     return {
       fishId: fishId,
-      fishName: fish.name,
       title: fish.name + ' window',
       start: range.start,
       end: range.end,
       targetStart: range.targetStart,
-      targetEnd: range.targetEnd,
-      prerequisites: range.prerequisites,
       location: locationParts.join(' - '),
       description: description.join('\n')
     };
@@ -209,40 +184,24 @@ let CalendarExport = function() {
     return folded.join('\r\n');
   }
 
-  function serializeICalendar(events, options) {
-    const reminderMinutes = options && REMINDER_OPTIONS.includes(options.reminderMinutes)
-        ? options.reminderMinutes
-        : null;
-    const generatedAt = options && options.generatedAtMs ? options.generatedAtMs : Date.now();
+  function serializeICalendar(event) {
     const lines = [
       'BEGIN:VCALENDAR',
       'VERSION:2.0',
-      'PRODID:-//FFXIV Fish Tracker//Big Fish Calendar Planner//EN',
-      'CALSCALE:GREGORIAN',
-      'METHOD:PUBLISH',
-      'X-WR-CALNAME:FFXIV Fishing Windows'
+      'PRODID:-//FFXIV Fish Tracker//Next Fish Window//EN',
+      'BEGIN:VEVENT',
+      'UID:ffxiv-fish-' + event.fishId + '-' + event.start + '@fish-tracker',
+      'DTSTAMP:' + formatUtcCalendarDate(Date.now()),
+      'DTSTART:' + formatUtcCalendarDate(event.start),
+      'DTEND:' + formatUtcCalendarDate(event.end),
+      'SUMMARY:' + escapeCalendarText(normalizeCalendarSeparators(event.title))
     ];
 
-    for (const event of events) {
-      lines.push('BEGIN:VEVENT');
-      lines.push('UID:ffxiv-fish-' + event.fishId + '-' + event.start + '@local-planner');
-      lines.push('DTSTAMP:' + formatUtcCalendarDate(generatedAt));
-      lines.push('DTSTART:' + formatUtcCalendarDate(event.start));
-      lines.push('DTEND:' + formatUtcCalendarDate(event.end));
-      lines.push('SUMMARY:' + escapeCalendarText(normalizeCalendarSeparators(event.title)));
-      if (event.location) lines.push('LOCATION:' + escapeCalendarText(event.location));
-      if (event.description) {
-        lines.push('DESCRIPTION:' + escapeCalendarText(normalizeCalendarSeparators(event.description)));
-      }
-      if (reminderMinutes !== null) {
-        lines.push('BEGIN:VALARM');
-        lines.push('TRIGGER:-PT' + reminderMinutes + 'M');
-        lines.push('ACTION:DISPLAY');
-        lines.push('DESCRIPTION:' + escapeCalendarText(normalizeCalendarSeparators(event.title)));
-        lines.push('END:VALARM');
-      }
-      lines.push('END:VEVENT');
+    if (event.location) lines.push('LOCATION:' + escapeCalendarText(event.location));
+    if (event.description) {
+      lines.push('DESCRIPTION:' + escapeCalendarText(normalizeCalendarSeparators(event.description)));
     }
+    lines.push('END:VEVENT');
     lines.push('END:VCALENDAR');
     return lines.map(foldCalendarLine).join('\r\n') + '\r\n';
   }
@@ -257,8 +216,8 @@ let CalendarExport = function() {
     return url.toString();
   }
 
-  function downloadICalendar(events, filename, options) {
-    const contents = serializeICalendar(events, options);
+  function downloadICalendar(event, filename) {
+    const contents = serializeICalendar(event);
     const blob = new Blob([contents], { type: 'text/calendar;charset=utf-8' });
     const url = URL.createObjectURL(blob);
     const link = document.createElement('a');
@@ -274,7 +233,6 @@ let CalendarExport = function() {
     buildCalendarRange: buildCalendarRange,
     buildFishEvent: buildFishEvent,
     createGoogleCalendarUrl: createGoogleCalendarUrl,
-    serializeICalendar: serializeICalendar,
     downloadICalendar: downloadICalendar
   };
 }();

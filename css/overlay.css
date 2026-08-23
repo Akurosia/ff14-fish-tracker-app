@@ -242,6 +242,43 @@ body.dark #fish-eyes-button.link.item.active:hover .sprite-icon-status-fish_eyes
   cursor: pointer;
 }
 
+.fish-availability-details {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0.2rem 0.5rem;
+  font-size: smaller;
+}
+
+.fish-next-window {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  white-space: nowrap;
+}
+
+.add-to-calendar-button.ui.button {
+  margin: 0;
+  vertical-align: middle;
+}
+
+.add-to-calendar-button.ui.dropdown > .menu {
+  max-width: calc(100vw - 2rem);
+  min-width: max-content;
+}
+
+.add-to-calendar-button:focus-visible {
+  outline: 2px solid currentColor;
+  outline-offset: 2px;
+}
+
+@media (max-width: 900px) {
+  .add-to-calendar-button.ui.button {
+    min-width: 2.75rem;
+    min-height: 2.75rem;
+  }
+}
+
 .alarm-cmd-button:hover {
   cursor: pointer;
 }

@@ -244,6 +244,19 @@ class FishEntry {
     }
   }
 
+  getNextCalendarEvent() {
+    const targetRange = this.data.catchableRanges[1];
+    if (targetRange === undefined) return null;
+
+    const observations = fishWatcher.getCatchableRangeObservations(this.data, targetRange);
+    const calendarRange = CalendarExport.buildCalendarRange(
+      this.data,
+      targetRange,
+      observations
+    );
+    return CalendarExport.buildFishEvent(this.data, calendarRange);
+  }
+
   update(earthTime, full = false) {
     // This function should be called whenever the underlying fish data has changed.
     // Make sure you do this BEFORE updating the display...
@@ -971,6 +984,56 @@ let ViewModel = new class {
     return true;
   }
 
+  updateCalendarActionState($entry, entry) {
+    const $dropdown = $('.add-to-calendar-button', $entry);
+    if ($dropdown.length === 0) return null;
+
+    const event = entry.getNextCalendarEvent();
+    const enabled = event !== null;
+    $dropdown
+      .toggleClass('disabled', !enabled)
+      .attr('aria-disabled', String(!enabled))
+      .attr('tabindex', enabled ? '0' : '-1');
+    return event;
+  }
+
+  initializeCalendarAction($entry, entry) {
+    const $dropdown = $('.add-to-calendar-button', $entry);
+    if ($dropdown.length === 0) return;
+
+    const resolveEvent = () => this.updateCalendarActionState($entry, entry);
+    $dropdown.dropdown({
+      action: 'hide',
+      onShow: () => resolveEvent() !== null
+    });
+    $dropdown.children('.menu').toggleClass('inverted', this.settings.theme === 'dark');
+
+    $('.google-calendar-action', $dropdown).on('click', e => {
+      const event = resolveEvent();
+      if (event === null) {
+        e.preventDefault();
+        return;
+      }
+      e.currentTarget.href = CalendarExport.createGoogleCalendarUrl(event);
+    });
+
+    $('.ics-calendar-action', $dropdown).on('click', e => {
+      e.preventDefault();
+      const event = resolveEvent();
+      if (event === null) return;
+
+      const targetStart = new Date(event.targetStart)
+          .toISOString()
+          .replace(/[-:]/g, '')
+          .replace(/\.\d{3}/, '');
+      const filename = 'ffxiv-fish-' + event.fishId + '-' + targetStart + '.ics';
+      CalendarExport.downloadICalendar([event], filename);
+      $dropdown.dropdown('hide');
+    });
+
+    resolveEvent();
+  }
+
   activateEntry(fish, earthTime) {
     // Check if there's already an entry for this fish.
     if (this.fishEntries[fish.id]) {
@@ -1031,6 +1094,8 @@ let ViewModel = new class {
         this.displayUpcomingWindows(intuitionFishEntry);
       });
 
+      this.initializeCalendarAction($subEntry, intuitionFishEntry);
+
       $('.alarm-cmd-button', $subEntry).on('click', e => {
         console.info("Displaying in-game alarm command for %s", intuitionFish.data.name);
         this.displayAlarmCommand(intuitionFishEntry);
@@ -1068,6 +1133,8 @@ let ViewModel = new class {
       console.info("Displaying upcoming windows for %s", fish.name);
       this.displayUpcomingWindows(entry);
     });
+
+    this.initializeCalendarAction($entry, entry);
 
     $('.alarm-cmd-button', $entry).on('click', e => {
       console.info("Displaying in-game alarm command for %s", fish.name);
@@ -1347,7 +1414,8 @@ let ViewModel = new class {
       $('*[data-tooltip]').removeAttr('data-inverted');
     }
 
-    $('.ui.menu').toggleClass('inverted', theme === 'dark');
+      $('.ui.menu').toggleClass('inverted', theme === 'dark');
+      $('.add-to-calendar-button > .menu').toggleClass('inverted', theme === 'dark');
     $('.ui.modal').toggleClass('inverted', theme === 'dark');
     $('.ui.message.announcement').toggleClass('inverted', theme === 'dark');
     $('.ui.message').toggleClass('inverted', theme === 'dark');

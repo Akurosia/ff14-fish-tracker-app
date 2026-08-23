@@ -9,10 +9,57 @@ class FishWatcher {
     // Placeholder for fishEntries.
     this.fishEntries = null;
 
+    // Intuition preparation metadata for the catchable ranges currently held
+    // by each Fish. Calendar consumers use this without changing the ranges
+    // themselves, since Fish.addCatchableRange may merge adjacent intervals.
+    this.catchableRangeObservations = new Map();
+
     // IMPORTANT!!!
     // The new view model does not regenerate templates every time. This means
     // we MUST NOT RACE the view model! We'll still schedule the updateFishes
     // function for every new bell, but let the view model do it please...
+  }
+
+  onCatchableRangeResolved(details) {
+    let observations = this.catchableRangeObservations.get(details.fish);
+    if (observations === undefined) {
+      observations = [];
+      this.catchableRangeObservations.set(details.fish, observations);
+    }
+    observations.push(details);
+  }
+
+  getCatchableRangeObservations(fish, targetRange = null) {
+    const observations = this.catchableRangeObservations.get(fish) || [];
+    if (targetRange === null) return observations.slice();
+    return observations.filter(observation =>
+      +observation.targetRange.end > +targetRange.start &&
+      +observation.targetRange.start < +targetRange.end
+    );
+  }
+
+  clearCatchableRangeObservations(fish) {
+    this.catchableRangeObservations.delete(fish);
+  }
+
+  pruneCatchableRangeObservations(fish) {
+    const retainedRanges = fish.catchableRanges.concat(fish.incompleteRanges || []);
+    if (retainedRanges.length === 0) {
+      this.clearCatchableRangeObservations(fish);
+      return;
+    }
+
+    const observations = this.getCatchableRangeObservations(fish).filter(observation =>
+      retainedRanges.some(range =>
+        +observation.targetRange.end > +range.start &&
+        +observation.targetRange.start < +range.end
+      )
+    );
+    if (observations.length === 0) {
+      this.clearCatchableRangeObservations(fish);
+    } else {
+      this.catchableRangeObservations.set(fish, observations);
+    }
   }
 
   setFishEyes(enabled, opts = {}) {
@@ -36,6 +83,7 @@ class FishWatcher {
     _(Fishes).chain().filter(fish => fish.fishEyes).each(fish => {
       fish.catchableRanges = [];
       fish.incompleteRanges = [];
+      this.clearCatchableRangeObservations(fish);
       fish.notifyCatchableRangesUpdated();
     });
     // STEP 2: Toggle "Fish Eyes" mode.
@@ -98,6 +146,7 @@ class FishWatcher {
         fish.catchableRanges.shift();
         fish.notifyCatchableRangesUpdated();
       }
+      this.pruneCatchableRangeObservations(fish);
     }
     console.timeEnd('cleanupFish');
 
@@ -136,6 +185,7 @@ class FishWatcher {
       fish.catchableRanges.shift();
       fish.notifyCatchableRangesUpdated();
     }
+    this.pruneCatchableRangeObservations(fish);
 
     // PHASE 1:
     //   Ensure each fish has at least 'n' windows defined.
@@ -256,6 +306,8 @@ class FishWatcher {
     // getting set to the same value. To solve this, we'll intersect nextRange with window.
     var origNextRange = nextRange;
     nextRange = dateFns.intervalIntersection(nextRange, window);
+    var observedPrerequisites = [];
+    var preparationStart = null;
 
     // If this fish has predators, we have to consider their windows too...
     // Basically, to ensure we get the same number of windows for every fish,
@@ -277,15 +329,22 @@ class FishWatcher {
         intuitionLength = 3600;
       }
       var prereqMet = _(fish.intuitionFish).chain()
-        .map(x => x.data)
-        .all(function(predatorFish) {
+        .all(function(intuitionFish) {
+          var predatorFish = intuitionFish.data;
           if (this._isFishAlwaysUp(predatorFish)) {
             atLeastOnePredatorAlwaysAvailable = true;
+            observedPrerequisites.push({
+              fish: predatorFish,
+              count: intuitionFish.count,
+              alwaysAvailable: true,
+              range: null
+            });
             return true;
           }
           predatorsAlwaysAvailable = false;
           var predWindow = null;
           var predRanges = [];
+          var observedPredRange = null;
           // Once again, we need to check if the weather right now works for
           // the predator fish.
           var iter = weatherService.findWeatherPattern(
@@ -397,6 +456,15 @@ class FishWatcher {
                 overallPredRange = mergedRange[0];
               }
             }
+            if (hasValidPredRange) observedPredRange = predRange;
+          }
+          if (hasValidPredRange) {
+            observedPrerequisites.push({
+              fish: predatorFish,
+              count: intuitionFish.count,
+              alwaysAvailable: false,
+              range: observedPredRange
+            });
           }
           return hasValidPredRange;
         }, this)
@@ -411,6 +479,7 @@ class FishWatcher {
       } else if (overallPredRange === null) {
         nextRange = null;
       } else {
+        preparationStart = overallPredRange.start;
         // If at least one of the predators is up all day, extend the accepted range to the
         // end of this window. Leave the start time alone though.
         if (atLeastOnePredatorAlwaysAvailable) {
@@ -429,7 +498,15 @@ class FishWatcher {
     // Now for the complicated part...
     // Update the catchable ranges using the intersection of the next range
     // and the window itself. Merge together bordering windows.
-    fish.addCatchableRange(dateFns.intervalIntersection(nextRange, window));
+    var catchableRange = dateFns.intervalIntersection(nextRange, window);
+    if (preparationStart === null) preparationStart = catchableRange.start;
+    fish.addCatchableRange(catchableRange);
+    this.onCatchableRangeResolved({
+      fish: fish,
+      targetRange: catchableRange,
+      preparationStart: preparationStart,
+      prerequisites: observedPrerequisites
+    });
     return dateFns.isWithinInterval(+window.end + 1, origNextRange);
   }
 }

@@ -12,11 +12,6 @@ let CalendarExport = function() {
     return weather ? __p(weather, 'name') : String(weatherId);
   }
 
-  function itemName(itemId) {
-    const item = DATA.ITEMS[itemId];
-    return item ? __p(item, 'name') : String(itemId);
-  }
-
   function formatEorzeaHour(hour) {
     if (hour === 24) return '24:00';
     const wholeHour = Math.floor(hour);
@@ -36,7 +31,10 @@ let CalendarExport = function() {
   function describeBait(fish) {
     return _.chain(fish.bestCatchPath || [])
         .flatten()
-        .map(itemName)
+        .map(itemId => {
+          const item = DATA.ITEMS[itemId];
+          return item ? __p(item, 'name') : String(itemId);
+        })
         .uniq()
         .value()
         .join(' -> ');

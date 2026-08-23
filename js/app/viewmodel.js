@@ -1427,7 +1427,6 @@ let ViewModel = new class {
     }
 
       $('.ui.menu').toggleClass('inverted', theme === 'dark');
-      $('.add-to-calendar-button > .menu').toggleClass('inverted', theme === 'dark');
     $('.ui.modal').toggleClass('inverted', theme === 'dark');
     $('.ui.message.announcement').toggleClass('inverted', theme === 'dark');
     $('.ui.message').toggleClass('inverted', theme === 'dark');

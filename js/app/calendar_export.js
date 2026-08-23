@@ -34,7 +34,12 @@ let CalendarExport = function() {
   }
 
   function describeBait(fish) {
-    return Array.from(new Set((fish.bestCatchPath || []).flat(Infinity).map(itemName))).join(' -> ');
+    return _.chain(fish.bestCatchPath || [])
+        .flatten()
+        .map(itemName)
+        .uniq()
+        .value()
+        .join(' -> ');
   }
 
   function describeEorzeaTime(fish) {

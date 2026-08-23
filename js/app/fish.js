@@ -299,7 +299,7 @@ class Fish {
     var nextPreparationStart = nextRange.preparationStart || nextRange.start;
     // Re-adding the custom "preparationStart" timestamp after the internalXor strips it by using the earliest prep
     // time from either fish window
-    if (merged.length == 1) {
+    if (merged.length === 1) {
       merged[0].preparationStart = new Date(Math.min(
         +lastPreparationStart, +nextPreparationStart));
     } else {

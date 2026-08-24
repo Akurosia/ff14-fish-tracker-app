@@ -49,7 +49,7 @@
 
     <link rel="stylesheet" href="public/images/sprite.css?7.5_20260428_1005" />
     <link rel="stylesheet" href="css/semantic_ui_overrides.css?20260625_2159" />
-    <link rel="stylesheet" href="css/overlay.css?20260801_1940" />
+    <link rel="stylesheet" href="css/overlay.css?20260824_1754" />
     <link rel="stylesheet" href="css/dark_overlay.css?20260414_2133" />
 
     <script type="text/javascript" src="js/app/checkForUpdates.js?20221001_1235"></script>
@@ -377,6 +377,7 @@
       </div>
       <div class="scrolling content">
         <div class="upcoming-windows-grid">
+          <div></div>
           <div class="header">
             <b>Next Start</b>
           </div>
@@ -390,6 +391,20 @@
             <b>Downtime</b>
           </div>
           {{~it.availability.upcomingWindows :nextWindow:idx}}
+            <div class="ui mini very compact icon buttons window-calendar">
+              <div class="ui icon button window-calendar-action"
+                   role="button" tabindex="0" aria-label="Add this window to calendar">
+                <i class="calendar plus outline icon"></i>
+                <div class="ui mini compact vertical popup menu window-calendar-menu" role="menu">
+                  <a class="item google-calendar-action" href="#" target="_blank" rel="noopener" role="menuitem">
+                    <i class="google icon"></i> Google Calendar
+                  </a>
+                  <a class="item ics-calendar-action" href="#" role="menuitem">
+                    <i class="download icon"></i> Download .ics
+                  </a>
+                </div>
+              </div>
+            </div>
             <div class="window-start">
               {{=dateFns.formatRelative(nextWindow.start, Date.now())}}
             </div>
@@ -418,7 +433,7 @@
     <script type="text/javascript" src="js/app/baittally.js?20251111_1551"></script>
     <script type="text/javascript" src="js/app/map.js?20250310_2300"></script>
     <!-- NOTE: The ViewModel should be the last script loaded. -->
-    <script type="text/javascript" src="js/app/viewmodel.js?20260823_1607"></script>
+    <script type="text/javascript" src="js/app/viewmodel.js?20260824_1751"></script>
 
     <script type="text/javascript">
       $(() => {

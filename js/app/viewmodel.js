@@ -233,6 +233,7 @@ class FishEntry {
         }
         let [previousWeather, weather] = _(weatherService.getWeatherSetForAreaAtTime(fish.location.zoneId, +cr.start)).map((w) => DATA.WEATHER_TYPES[w]);
         return {
+          range: cr,
           start: start,
           end: end,
           duration: dateFns.formatDistanceStrict(end, start, { roundingMethod: 'floor' }),
@@ -242,29 +243,6 @@ class FishEntry {
         };
       });
     }
-  }
-
-  getNextCalendarEvent() {
-    const ranges = this.data.catchableRanges;
-    const currentRange = ranges[0];
-    if (currentRange === undefined) {
-      return null;
-    }
-
-    // Remind the user about the upcoming window for the given fish, or the *next* window if it's already underway.
-    const currentStart = eorzeaTime.toEarth(+currentRange.start);
-    const targetRange = dateFns.isAfter(currentStart, Date.now())
-        ? currentRange
-        : ranges[1];
-
-    if (targetRange === undefined) {
-      return null;
-    }
-
-    return CalendarExport.buildFishEvent(
-      this.data,
-      targetRange
-    );
   }
 
   update(earthTime, full = false) {
@@ -974,12 +952,17 @@ let ViewModel = new class {
       this.$upcomingWindows.modal('hide');
     }
 
+    // Ensuring the rows are up to date for when the modal opens
+    entry.updateNextWindowData();
+    const upcomingWindows = entry.availability.upcomingWindows;
+
     // First, we need to update the contents of the modal. It may already be empty,
     // but either way, we're going to clear out, and start fresh.
     // We also want to remember which fish is being displayed.
     this.upcomingWindowsEntry = entry;
     this.$upcomingWindows.empty().append(
-      this.layout.templates.upcomingWindows(entry));
+    this.layout.templates.upcomingWindows(entry));
+    this.initializeUpcomingWindowCalendarActions(entry, upcomingWindows);
 
     // Now we can display the modal. If it wasn't already initialized, this should
     // take can of that too.
@@ -990,35 +973,82 @@ let ViewModel = new class {
   onHideUpcomingWindows($element) {
     // Since the modal is now hidden, let's remove the setting too.
     ViewModel.upcomingWindowsEntry = null;
+    $('.window-calendar-menu').remove();
     // Always allow the modal to hide.
     return true;
   }
 
-  updateCalendarActionState($entry, entry) {
-    const $dropdown = $('.add-to-calendar-button', $entry);
-    if ($dropdown.length === 0) return null;
+  resolveUpcomingWindowCalendarAction(entry, upcomingWindow) {
+    const unavailableTooltip = 'Calendar details are unavailable for this window';
+    if (upcomingWindow === undefined) {
+      return {
+        event: null,
+        disabledTooltip: unavailableTooltip
+      };
+    }
 
-    const event = entry.getNextCalendarEvent();
-    const enabled = event !== null;
+    if (!dateFns.isAfter(upcomingWindow.start, Date.now())) {
+      return {
+        event: null,
+        disabledTooltip: 'This window is already underway'
+      };
+    }
+
+    const event = CalendarExport.buildFishEvent(entry.data, upcomingWindow.range);
+    return {
+      event: event,
+      disabledTooltip: event === null ? unavailableTooltip : null
+    };
+  }
+
+  updateCalendarActionState($dropdown, resolveAction) {
+    const action = resolveAction();
+    const enabled = action.event !== null;
+    const $tooltipTarget = $dropdown.parent();
+    const tooltip = enabled ? 'Add this window to calendar' : action.disabledTooltip;
     $dropdown
       .toggleClass('disabled', !enabled)
       .attr('aria-disabled', String(!enabled))
       .attr('tabindex', enabled ? '0' : '-1');
-    return event;
+    $tooltipTarget.attr('data-content', tooltip);
+    return action.event;
   }
 
-  initializeCalendarAction($entry, entry) {
-    const $dropdown = $('.add-to-calendar-button', $entry);
-    if ($dropdown.length === 0) return;
+  initializeCalendarAction($dropdown, resolveAction) {
+    const $tooltipTarget = $dropdown.parent();
+    const $scrollContext = $('.scrolling.content', this.$upcomingWindows);
+    const $menu = $dropdown.children('.window-calendar-menu').appendTo(document.body);
+    const resolveEvent = () => this.updateCalendarActionState($dropdown, resolveAction);
+    resolveEvent();
 
-    const resolveEvent = () => this.updateCalendarActionState($entry, entry);
-    $dropdown.dropdown({
-      action: 'hide',
+    $tooltipTarget.popup({
+      exclusive: true,
+      movePopup: false,
+      position: 'left center',
+      scrollContext: $scrollContext,
+      variation: this.settings.theme === 'dark'
+        ? 'mini inverted window-calendar-tooltip'
+        : 'mini window-calendar-tooltip',
+      onShow: () => {
+        resolveEvent();
+        $tooltipTarget.popup('change content', $tooltipTarget.attr('data-content'));
+        return true;
+      }
+    });
+
+    $dropdown.popup({
+      context: 'body',
+      exclusive: true,
+      movePopup: false,
+      on: 'click',
+      popup: $menu,
+      position: 'right center',
       onShow: () => resolveEvent() !== null
     });
-    $dropdown.children('.menu').toggleClass('inverted', this.settings.theme === 'dark');
+    $dropdown.add($menu)
+      .toggleClass('inverted', this.settings.theme === 'dark');
 
-    $('.google-calendar-action', $dropdown).on('click', e => {
+    $('.google-calendar-action', $menu).on('click', e => {
       const event = resolveEvent();
       if (event === null) {
         e.preventDefault();
@@ -1027,7 +1057,7 @@ let ViewModel = new class {
       e.currentTarget.href = CalendarExport.createGoogleCalendarUrl(event);
     });
 
-    $('.ics-calendar-action', $dropdown).on('click', e => {
+    $('.ics-calendar-action', $menu).on('click', e => {
       e.preventDefault();
       const event = resolveEvent();
       if (event === null) return;
@@ -1038,10 +1068,18 @@ let ViewModel = new class {
           .replace(/\.\d{3}/, '');
       const filename = 'ffxiv-fish-' + event.fishId + '-' + targetStart + '.ics';
       CalendarExport.downloadICalendar(event, filename);
-      $dropdown.dropdown('hide');
+      $dropdown.popup('hide');
     });
+  }
 
-    resolveEvent();
+  initializeUpcomingWindowCalendarActions(entry, upcomingWindows) {
+    $('.window-calendar-action', this.$upcomingWindows).each((idx, element) => {
+      const $dropdown = $(element);
+      const upcomingWindow = upcomingWindows[idx];
+      this.initializeCalendarAction(
+        $dropdown,
+        () => this.resolveUpcomingWindowCalendarAction(entry, upcomingWindow));
+    });
   }
 
   activateEntry(fish, earthTime) {
@@ -1104,8 +1142,6 @@ let ViewModel = new class {
         this.displayUpcomingWindows(intuitionFishEntry);
       });
 
-      this.initializeCalendarAction($subEntry, intuitionFishEntry);
-
       $('.alarm-cmd-button', $subEntry).on('click', e => {
         console.info("Displaying in-game alarm command for %s", intuitionFish.data.name);
         this.displayAlarmCommand(intuitionFishEntry);
@@ -1143,8 +1179,6 @@ let ViewModel = new class {
       console.info("Displaying upcoming windows for %s", fish.name);
       this.displayUpcomingWindows(entry);
     });
-
-    this.initializeCalendarAction($entry, entry);
 
     $('.alarm-cmd-button', $entry).on('click', e => {
       console.info("Displaying in-game alarm command for %s", fish.name);

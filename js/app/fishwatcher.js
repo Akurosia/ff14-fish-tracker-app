@@ -278,8 +278,8 @@ class FishWatcher {
         intuitionLength = 3600;
       }
       var prereqMet = _(fish.intuitionFish).chain()
-        .all(function(intuitionFish) {
-          var predatorFish = intuitionFish.data;
+        .map(x => x.data)
+        .all(function(predatorFish) {
           if (this._isFishAlwaysUp(predatorFish)) {
             atLeastOnePredatorAlwaysAvailable = true;
             return true;

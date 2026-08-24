@@ -29,14 +29,29 @@ let CalendarExport = function() {
   }
 
   function describeBait(fish) {
-    return _.chain(fish.bestCatchPath || [])
-        .flatten()
-        .map(itemId => {
-          const item = DATA.ITEMS[itemId];
-          return item ? __p(item, 'name') : String(itemId);
+    const tugIndicators = {
+      light: '(!)',
+      medium: '(!!)',
+      heavy: '(!!!)'
+    };
+
+    const catchPath = fish.bestCatchPath || [];
+    return catchPath
+        .map((step, index) => {
+          const itemIds = Array.isArray(step) ? step : [step];
+          const names = itemIds
+              .map(itemId => {
+                const item = DATA.ITEMS[itemId];
+                return item ? __p(item, 'name') : String(itemId);
+              })
+              .join(' / ');
+          const nextStep = catchPath[index + 1];
+          const nextFishId = Array.isArray(nextStep) ? nextStep[0] : nextStep;
+          const nextTug = index === catchPath.length - 1
+              ? tugIndicators[fish.tug]
+              : DATA.FISH[nextFishId] && tugIndicators[DATA.FISH[nextFishId].tug];
+          return nextTug ? names + ' ' + nextTug : names;
         })
-        .uniq()
-        .value()
         .join(' -> ');
   }
 

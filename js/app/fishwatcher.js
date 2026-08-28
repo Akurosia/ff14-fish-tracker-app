@@ -428,12 +428,15 @@ class FishWatcher {
       return false;
     }
 
+    var catchableRange = dateFns.intervalIntersection(nextRange, window);
+    if (preparationStart === null) {
+      preparationStart = catchableRange.start;
+    }
+    catchableRange.preparationStart = preparationStart;
+
     // Now for the complicated part...
     // Update the catchable ranges using the intersection of the next range
     // and the window itself. Merge together bordering windows.
-    var catchableRange = dateFns.intervalIntersection(nextRange, window);
-    if (preparationStart === null) preparationStart = catchableRange.start;
-    catchableRange.preparationStart = preparationStart;
     fish.addCatchableRange(catchableRange);
     return dateFns.isWithinInterval(+window.end + 1, origNextRange);
   }

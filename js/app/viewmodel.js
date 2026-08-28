@@ -1045,7 +1045,7 @@ let ViewModel = new class {
       position: 'right center',
       onShow: () => resolveEvent() !== null
     });
-    $dropdown.add($menu)
+    $dropdown.add($menu).add($menu.children('.ui.menu'))
       .toggleClass('inverted', this.settings.theme === 'dark');
 
     $('.google-calendar-action', $menu).on('click', e => {

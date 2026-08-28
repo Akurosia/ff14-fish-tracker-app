@@ -292,6 +292,12 @@ body.dark #fish-eyes-button.link.item.active:hover .sprite-icon-status-fish_eyes
   padding: 0;
 }
 
+.ui.popup.window-calendar-menu > .ui.menu {
+  margin: 0;
+  border: 0;
+  box-shadow: none;
+}
+
 .upcoming-windows-grid .window-weather-and-time i.arrow.right.icon {
   vertical-align: middle;
   margin-left: -0.25rem;

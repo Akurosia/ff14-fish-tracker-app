@@ -961,7 +961,7 @@ let ViewModel = new class {
     // We also want to remember which fish is being displayed.
     this.upcomingWindowsEntry = entry;
     this.$upcomingWindows.empty().append(
-    this.layout.templates.upcomingWindows(entry));
+      this.layout.templates.upcomingWindows(entry));
     this.initializeUpcomingWindowCalendarActions(entry, upcomingWindows);
 
     // Now we can display the modal. If it wasn't already initialized, this should

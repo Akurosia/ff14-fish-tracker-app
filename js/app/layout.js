@@ -222,8 +222,6 @@ class FishTableLayout {
         .text((fishEntry.uptime * 100.0).toFixed(1));
     }
 
-    ViewModel.updateCalendarActionState($fishEntry, fishEntry);
-
     // Omit this if the fish doesn't have limited availability.. obviously...
     if (hasLimitedAvailability) {
       // Set the "current availability" time. Remember, we've cached the other

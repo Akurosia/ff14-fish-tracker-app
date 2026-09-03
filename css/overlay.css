@@ -279,6 +279,14 @@ body.dark #fish-eyes-button.link.item.active:hover .sprite-icon-status-fish_eyes
   justify-self: center;
 }
 
+.upcoming-windows-grid .window-calendar-action:not(.disabled) {
+  cursor: pointer;
+}
+
+.upcoming-windows-grid .window-calendar-action.disabled {
+  opacity: 0.45;
+}
+
 .upcoming-windows-grid .window-calendar-action:focus-visible {
   outline: 2px solid currentColor;
   outline-offset: 2px;

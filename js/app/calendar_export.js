@@ -7,11 +7,6 @@ let CalendarExport = function() {
     return String(value).padStart(2, '0');
   }
 
-  function weatherName(weatherId) {
-    const weather = DATA.WEATHER_TYPES[weatherId];
-    return weather ? __p(weather, 'name') : String(weatherId);
-  }
-
   function formatEorzeaHour(hour) {
     if (hour === 24) return '24:00';
     const wholeHour = Math.floor(hour);
@@ -20,11 +15,13 @@ let CalendarExport = function() {
   }
 
   function describeWeather(fish) {
-    const previous = fish.previousWeatherSet.map(weatherName);
-    const current = fish.weatherSet.map(weatherName);
+    const previous = _(fish.conditions.previousWeatherSet).map(weather => __p(weather, 'name'));
+    const current = _(fish.conditions.weatherSet).map(weather => __p(weather, 'name'));
+
     if (previous.length > 0) {
       return previous.join(' / ') + ' -> ' + (current.length ? current.join(' / ') : 'any weather');
     }
+
     return current.length ? current.join(' / ') : 'Any weather';
   }
 
@@ -36,23 +33,22 @@ let CalendarExport = function() {
     };
 
     const catchPath = fish.bestCatchPath || [];
-    return catchPath
-        .map((step, index) => {
-          const itemIds = Array.isArray(step) ? step : [step];
-          const names = itemIds
-              .map(itemId => {
-                const item = DATA.ITEMS[itemId];
-                return item ? __p(item, 'name') : String(itemId);
-              })
-              .join(' / ');
-          const nextStep = catchPath[index + 1];
-          const nextFishId = Array.isArray(nextStep) ? nextStep[0] : nextStep;
-          const nextTug = index === catchPath.length - 1
-              ? tugIndicators[fish.tug]
-              : DATA.FISH[nextFishId] && tugIndicators[DATA.FISH[nextFishId].tug];
-          return nextTug ? names + ' ' + nextTug : names;
-        })
-        .join(' -> ');
+    return _(catchPath).map((step, index) => {
+      const itemIds = Array.isArray(step) ? step : [step];
+
+      const names = _(itemIds).map(itemId => {
+        const item = DATA.ITEMS[itemId];
+        return item ? __p(item, 'name') : String(itemId);
+      }).join(' / ');
+
+      const nextStep = catchPath[index + 1];
+      const nextFishId = Array.isArray(nextStep) ? nextStep[0] : nextStep;
+      const nextTug = index === catchPath.length - 1
+          ? tugIndicators[fish.tug]
+          : DATA.FISH[nextFishId] && tugIndicators[DATA.FISH[nextFishId].tug];
+
+      return nextTug ? names + ' ' + nextTug : names;
+    }).join(' -> ');
   }
 
   function describeEorzeaTime(fish) {
@@ -73,14 +69,18 @@ let CalendarExport = function() {
       return null;
     }
 
-    const preparationStart = targetRange.preparationStart || targetRange.start;
-    const prerequisites = intuitionFish.map(intuition => ({
-      name: intuition.data.name,
-      count: intuition.count,
-      startHour: intuition.data.startHour,
-      endHour: intuition.data.endHour,
-      weather: describeWeather(intuition.data)
-    }));
+    const preparation = fishWatcher.getPrepFor(fish, targetRange);
+    const prerequisites = _(intuitionFish).map(predator => {
+      const predatorFish = predator.data;
+
+      return {
+        name: predatorFish.name,
+        count: predator.count,
+        time: describeEorzeaTime(predatorFish),
+        weather: describeWeather(predatorFish),
+        bait: describeBait(predatorFish)
+      };
+    });
 
     const locationParts = [fish.location.zoneName, fish.location.name].filter(Boolean);
     const hasIntuition = prerequisites.length > 0;
@@ -100,15 +100,23 @@ let CalendarExport = function() {
     }
 
     if (hasIntuition) {
+      description.push(""); // Line break
       description.push("Intuition Requirements:");
-      prerequisites.forEach(prerequisite => {
-        const time = prerequisite.startHour === 0 && prerequisite.endHour === 24
-            ? 'All day ET'
-            : formatEorzeaHour(prerequisite.startHour) + '-' + formatEorzeaHour(prerequisite.endHour) + ' ET';
-        description.push(prerequisite.count + 'x ' + prerequisite.name + ' - ' + time +
-            ' - Weather: ' + prerequisite.weather);
+      _(prerequisites).each(prerequisite => {
+        let requirement = prerequisite.count + 'x ' + prerequisite.name + ' - ' + prerequisite.time +
+            ' - Weather: ' + prerequisite.weather;
+        if (prerequisite.bait) {
+          requirement += ' - Bait: ' + prerequisite.bait;
+        }
+        description.push(requirement);
       });
       description.push('The calendar event starts when intuition fish are available.');
+      description.push(""); // Line break
+    }
+
+    if (preparation.moochFish !== null) {
+      description.push('The calendar event starts when ' + preparation.moochFish.name +
+          ' is available.');
     }
     description.push('Patch: ' + fish.patch);
 
@@ -119,7 +127,7 @@ let CalendarExport = function() {
     return {
       fishId: fishId,
       title: fish.name + ' window',
-      start: eorzeaTime.toEarth(preparationStart),
+      start: eorzeaTime.toEarth(preparation.start),
       end: eorzeaTime.toEarth(+targetRange.end),
       targetStart: eorzeaTime.toEarth(+targetRange.start),
       location: locationParts.join(' - '),
@@ -180,7 +188,7 @@ let CalendarExport = function() {
     }
     lines.push('END:VEVENT');
     lines.push('END:VCALENDAR');
-    return lines.map(foldCalendarLine).join('\r\n') + '\r\n';
+    return _(lines).map(foldCalendarLine).join('\r\n') + '\r\n';
   }
 
   function createGoogleCalendarUrl(event) {

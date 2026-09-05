@@ -1458,7 +1458,7 @@ let ViewModel = new class {
       $('*[data-tooltip]').removeAttr('data-inverted');
     }
 
-      $('.ui.menu').toggleClass('inverted', theme === 'dark');
+    $('.ui.menu').toggleClass('inverted', theme === 'dark');
     $('.ui.modal').toggleClass('inverted', theme === 'dark');
     $('.ui.message.announcement').toggleClass('inverted', theme === 'dark');
     $('.ui.message').toggleClass('inverted', theme === 'dark');

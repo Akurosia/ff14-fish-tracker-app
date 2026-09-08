@@ -15494,7 +15494,7 @@
   patch: 7.55
 - name: Xehabopo'u
   location: Miyakabek'zu
-  startHour: 12
+  startHour: 13
   endHour: 15
   previousWeatherSet:
   - Clouds
@@ -15510,7 +15510,6 @@
   lure:
   snagging:
   patch: 7.55
-  dataMissing: true
 - name: Skyfrond
   location: Cenote Jayunja
   startHour: 16
